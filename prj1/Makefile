@@ -7,7 +7,7 @@ report/report.pdf: report/report.tex
 	pdflatex report.tex
 	cd ..
 
-submission.tar: predictions_regression.csv test_errors_regression.csv predictions_classification.csv test_errors_classification.csv report.pdf
+istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_classification.csv test_errors_classification.csv report.pdf *.m
 	mkdir -p submission
 	cp leastSquaresGD.m submission/
 	cp leastSquares.m submission/
@@ -23,3 +23,5 @@ submission.tar: predictions_regression.csv test_errors_regression.csv prediction
 	cp test_errors_classification.csv submission/
 	cp report.pdf submission/
 	zip -r istanbul.zip submission
+
+package: istanbul.zip
