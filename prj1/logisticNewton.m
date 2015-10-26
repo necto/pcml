@@ -10,7 +10,7 @@
 function [ beta ] = logisticNewton( y, tX, alpha )
   % Initial values for beta to start with.
   beta = ones(size(tX,2), 1)*1e-3;
-  
+
   % Termination parameters. The loop terminates whenever some of the events
   % happen: two subsequent logisitc values differ less than by epsilon, or
   % maxIters iterations performed.
