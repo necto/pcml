@@ -13,7 +13,6 @@ end
 y = tX * beta;
 % max error
 eps = 1e-2;
-eye(10)
 % test least squares via gradient descent
 disp('least squares via gradient descent...');
 alpha = 0.01;
@@ -53,7 +52,7 @@ tY = 1.0 ./ (1.0 + exp(-tX * tBeta)) > 0.5;
 assert(sum(tY ~= y) / size(y,1) < 0.2);
 disp('OK!');
 
-testing penalize logistic regression
+% testing penalize logistic regression
 disp('penalized logistic regression...');
 alpha = 1e-3;
 lambda = 1e-2;

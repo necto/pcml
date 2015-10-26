@@ -1,4 +1,4 @@
-function [ L, g ] = penLogisticRegLoss(beta, tX, y)
+function [ L, g ] = penLogisticRegLoss(beta, tX, y, lambda)
     % Compute the sigmoid (1/(1 + exp(-Xt*beta)) value;
     sigma = sigmf(tX*beta, [1 0]);
     L = - y'*tX*beta + ones(1, length(tX))*log(1 + exp(tX*beta));

@@ -10,7 +10,7 @@ function [ beta ] = penLogisticRegression(y, tX, alpha, lambda)
     epsilon = 1e-5;
   
     for k = 1:maxIters
-        [L, g] = penLogisticRegLoss(beta, tX, y);
+        [L, g] = penLogisticRegLoss(beta, tX, y, lambda);
         beta = beta - alpha * g;
         % Check convergence
         if(k > 1 && abs(L_prev - L) < epsilon) break; end; 
