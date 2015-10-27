@@ -7,3 +7,4 @@
  - optimal lambda value is 0.2656, giving the cross-validation test error: 0.0964 ; and the untouched test error: 0.1311 :(
 4) Trying to shrink the set of features. Ran cross-validation, trying to fit data without each single feature. The feature #18 (counting from the 'ones' column) promises 0.0954 cross-validation mean error. Unfortunately, applying linear regression wieht the feature #18 deleted to the untouched data gives 0.1178 mispredicaiton fraction.
 5) Tried add features in the power of 2,3,4,5,6,7,8 (see generalized myPoly), The best rezult is achieved without this transformation.
+6) Checked real polynoms of the second degree: cross-validation test error: 0.0210. But the fresh test misprediction ratio is again much worse: 0.1578. It seems that the bias is not gone yet :(

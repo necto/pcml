@@ -12,7 +12,7 @@ function [ beta ] = logisticRegression( y, tX, alpha )
   % L values are closer than epsilon, or after maxIters iterations,
   % whicever happens earlier.
   maxIters = 1000000;
-  epsilon = 1e-2;%5;
+  epsilon = 1e-5;
   
   for k = 1:maxIters
      [L, g] = logisticRegLoss(beta, tX, y);

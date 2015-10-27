@@ -45,8 +45,8 @@ noFeatureTestError = sum((sigmoid(tXTe(:, [1:iStar-1 iStar+1:end]) * nfBeta) > 0
 plot(errorTe);
 %}
 
-mvals = [1 4 5 6 7 8];
-lvals = logspace(-2, 2, 3);
+mvals = [1 2];
+lvals = logspace(-2, 2, 7);
 
 errorTeSub = zeros(K,1);
 errorTrSub = zeros(K,1);
@@ -62,7 +62,7 @@ for j = 1:length(mvals)
             errorTeSub(k) = sum((sigmoid(pXTrTe*beta) > 0.5) ~= yTrTe)/size(yTrTe,1);
             errorTrSub(k) = sum((sigmoid(pXTrTr*beta) > 0.5) ~= yTrTr)/size(yTrTr,1);
         end;
-        errorTe(j, l) = mean(errorTeSub)
+        errorTe(j, l) = mean(errorTeSub);
         errorTr(j, l) = mean(errorTrSub)
     end;
 end;
