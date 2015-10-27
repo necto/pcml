@@ -47,7 +47,7 @@ disp('OK!');
 
 % testing logistic regression
 disp('Newton logistic regression...');
-alpha = 1e-2;
+alpha = 1e-3;
 tBeta = logisticNewton(y,tX,alpha);
 tY = 1.0 ./ (1.0 + exp(-tX * tBeta)) > 0.5;
 assert(sum(tY ~= y) / size(y,1) < 0.2);
