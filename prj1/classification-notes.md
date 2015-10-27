@@ -10,3 +10,8 @@
 6) Checked real polynoms of 
  - the second degree: cross-validation test error: 0.0210. But the fresh test misprediction ratio is again much worse: 0.1578. It seems that the bias is not gone yet :(
  - the third degree(13825 features!): CV test error: 0.0095 (!); fresh test error: 0.1378 :(
+7) Replace a discrete feature by a set of binary indicators gives:
+ - for 8-th - 0.1022
+ - for 9-th - 0.1044
+ - for 10-th - 0.1044
+ - for 17-th - 0.1067 - the same untouched data error.

@@ -3,6 +3,10 @@ load('data/classification.mat');
 
 y_train = (y_train + 1)/2; % !!! remember invert that for predictions
 
+for i = unique(X_train(:,8))'
+    X_train(:,size(X_train, 2)+1) = (X_train(:,8) == i);
+end
+
 [XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.7);
 [XTr, XTr_mean, XTr_std] = normalize(XTr);
 XTe = adjust(XTe, XTr_mean, XTr_std);
@@ -45,6 +49,7 @@ noFeatureTestError = sum((sigmoid(tXTe(:, [1:iStar-1 iStar+1:end]) * nfBeta) > 0
 plot(errorTe);
 %}
 
+%{
 mvals = [1 2 3];
 lvals = logspace(-2, 2, 8);
 
@@ -66,6 +71,8 @@ for j = 1:length(mvals)
         errorTr(j, l) = mean(errorTrSub)
     end;
 end;
+
+%}
 
 %{
 
