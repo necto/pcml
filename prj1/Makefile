@@ -25,3 +25,6 @@ istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_
 	zip -r istanbul.zip submission
 
 package: istanbul.zip
+
+clean:
+	rm predictions_classification.csv
