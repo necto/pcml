@@ -45,8 +45,8 @@ noFeatureTestError = sum((sigmoid(tXTe(:, [1:iStar-1 iStar+1:end]) * nfBeta) > 0
 plot(errorTe);
 %}
 
-mvals = [1 2];
-lvals = logspace(-2, 2, 7);
+mvals = [1 2 3];
+lvals = logspace(-2, 2, 8);
 
 errorTeSub = zeros(K,1);
 errorTrSub = zeros(K,1);
@@ -58,7 +58,7 @@ for j = 1:length(mvals)
         for k = 1:K
             [yTrTe, yTrTr, pXTrTe, pXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
         
-            beta = penLogisticRegression(yTrTr, pXTrTr, 0.001, lambda);
+            beta = penLogisticRegression(yTrTr, pXTrTr, 0.00002, lambda);
             errorTeSub(k) = sum((sigmoid(pXTrTe*beta) > 0.5) ~= yTrTe)/size(yTrTe,1);
             errorTrSub(k) = sum((sigmoid(pXTrTr*beta) > 0.5) ~= yTrTr)/size(yTrTr,1);
         end;
