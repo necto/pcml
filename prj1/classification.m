@@ -14,8 +14,6 @@ lrBeta = logisticRegression(yTr, tXTr, 0.001);
 lrY = sigmoid(tXTe * lrBeta) > 0.5;
 logisticRegressionTestError = sum(lrY ~= yTe)/size(yTe, 1)
 
-%{
-
 K = 4;
 N = size(yTr, 1);
 idx = randperm(N);
@@ -25,6 +23,7 @@ for k = 1:K
     idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
 end;
 
+%{
 for i = 1:size(tXTr,2)
     errorTeSub = zeros(K, 1);
     errorTrSub = zeros(K, 1);
@@ -46,10 +45,27 @@ noFeatureTestError = sum((sigmoid(tXTe(:, [1:iStar-1 iStar+1:end]) * nfBeta) > 0
 plot(errorTe);
 %}
 
-%mvals = 1:10;
-%lvals = logspace(-2, 2, 10);
+mvals = [1 4 5 6 7 8];
+lvals = logspace(-2, 2, 3);
 
-
+errorTeSub = zeros(K,1);
+errorTrSub = zeros(K,1);
+for j = 1:length(mvals)
+    m = mvals(j);
+    pXTr = [ones(size(XTr, 1), 1) myPoly(XTr, m)];
+    for l = 1:length(lvals)
+        lambda = lvals(l);
+        for k = 1:K
+            [yTrTe, yTrTr, pXTrTe, pXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
+        
+            beta = penLogisticRegression(yTrTr, pXTrTr, 0.001, lambda);
+            errorTeSub(k) = sum((sigmoid(pXTrTe*beta) > 0.5) ~= yTrTe)/size(yTrTe,1);
+            errorTrSub(k) = sum((sigmoid(pXTrTr*beta) > 0.5) ~= yTrTr)/size(yTrTr,1);
+        end;
+        errorTe(j, l) = mean(errorTeSub)
+        errorTr(j, l) = mean(errorTrSub)
+    end;
+end;
 
 %{
 
