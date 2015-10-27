@@ -1,0 +1,2 @@
+1) Tried a trivial logistic regression with normalized features. Tested on a untouched test set (0.3 fraction of the original training set). Does not work: 402 misspredictions out of 450 (a lot more than 50%, amazing)
+2) Tried a penalized logistic regression using cross validation to choose lambda. Independently on lambda, I've got very high level of misspredication (constant on lambda). That is weird, must be a mistake in the implementation somewhere.
