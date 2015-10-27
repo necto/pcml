@@ -14,13 +14,44 @@ lrBeta = logisticRegression(yTr, tXTr, 0.001);
 lrY = sigmoid(tXTe * lrBeta) > 0.5;
 logisticRegressionTestError = sum(lrY ~= yTe)/size(yTe, 1)
 
+%{
+
 K = 4;
 N = size(yTr, 1);
 idx = randperm(N);
 Nk = floor(N/K);
+idxCV = zeros(K, Nk);
 for k = 1:K
     idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
 end;
+
+for i = 1:size(tXTr,2)
+    errorTeSub = zeros(K, 1);
+    errorTrSub = zeros(K, 1);
+    for k = 1:K
+        [yTrTe, yTrTr, tXTrTe, tXTrTr] = split4crossValidation(k, idxCV, yTr, tXTr);
+        
+        beta = logisticRegression(yTrTr, tXTrTr(:,[1:i-1 i+1:end]), 0.001);
+        errorTeSub(k) = sum((sigmoid(tXTrTe(:,[1:i-1 i+1:end])*beta) > 0.5) ~= yTrTe)/size(yTrTe,1);
+        errorTrSub(k) = sum((sigmoid(tXTrTr(:,[1:i-1 i+1:end])*beta) > 0.5) ~= yTrTr)/size(yTrTr,1);
+    end
+    errorTe(i) = mean(errorTeSub)
+    errorTr(i) = mean(errorTrSub);
+end
+[errorStar iStar] = min(errorTe);
+
+nfBeta = logisticRegression(yTr, tXTr(:, [1:iStar-1 iStar+1:end]), 0.001);
+noFeatureTestError = sum((sigmoid(tXTe(:, [1:iStar-1 iStar+1:end]) * nfBeta) > 0.5) ~= yTe)/size(yTe,1)
+
+plot(errorTe);
+%}
+
+%mvals = 1:10;
+%lvals = logspace(-2, 2, 10);
+
+
+
+%{
 
 % TODO: choose the right low and high borders to produce a nice-looking
 % graph.
@@ -32,13 +63,7 @@ for l = 1:length(lvals)
     errorTeSub = zeros(K,1);
     errorTrSub = zeros(K,1);
     for k = 1:K
-        idxTe = idxCV(k, :);
-        idxTr = idxCV([1:k-1 k+1:end]);
-        idxTr = idxTr(:);
-        yTrTe = yTr(idxTe);
-        yTrTr = yTr(idxTr);
-        tXTrTe = tXTr(idxTe,:);
-        tXTrTr = tXTr(idxTr,:);
+        [yTrTe, yTrTr, tXTrTe, tXTrTr] = split4crossValidation(k, idxCV, yTr, tXTr);
         
         beta = penLogisticRegression(yTrTr, tXTrTr, 0.001, lambda);
         
@@ -58,4 +83,5 @@ hold on;
 plot(lvals, errorTr);
 set(gca,'XScale', 'log');
 
+%}
 

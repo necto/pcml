@@ -5,3 +5,4 @@
 2') playing with the lambda log diapason (starting from 0.0001): determined: nothing really changes until lambda reaches 0.01.
  - test and train errors are practically identical for the whole spectrum of lambda. meaning that there is no variance, only bias.
  - optimal lambda value is 0.2656, giving the cross-validation test error: 0.0964 ; and the untouched test error: 0.1311 :(
+4) Trying to shrink the set of features. Ran cross-validation, trying to fit data without each single feature. The feature #18 (counting from the 'ones' column) promises 0.0954 cross-validation mean error. Unfortunately, applying linear regression wieht the feature #18 deleted to the untouched data gives 0.1178 mispredicaiton fraction.
