@@ -1,7 +1,8 @@
 function [ L, g ] = penLogisticRegLoss(beta, tX, y, lambda)
     % Compute the sigmoid (1/(1 + exp(-Xt*beta)) value;
-    sigma = sigmoid(tX*beta);
-    L = - y'*tX*beta + ones(1, length(tX))*log(1 + exp(tX*beta)) + lambda*(beta'*beta);
+    txb = tX*beta;
+    sigma = sigmoid(txb);
+    L = - y'*txb + ones(1, size(tX, 1))*log(1 + exp(txb)) + lambda*(beta'*beta);
     g = tX'*(sigma - y) + 2*lambda*beta;
     %S = diag(sigma)*diag(1 - sigma);
     %Id = eye(size(tX,2));Id(1,1)=0;
