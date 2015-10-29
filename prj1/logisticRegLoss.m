@@ -8,7 +8,9 @@
 function [ L, g ] = logisticRegLoss( beta, tX, y )
   % Compute the sigmoid (1/(1 + exp(-Xt*beta)) value;
   sigma = sigmoid(tX*beta);
-  L = - y'*tX*beta + ones(1, length(tX))*log(1 + exp(tX*beta));
-  g = tX'*(sigma - y);
+  N = size(tX, 1);
+  txb = tX*beta;
+  L = - y'*txb/N + ones(1, N)*log1PlusExp(txb)/N;
+  g = tX'*(sigma - y)/N;
 end
 

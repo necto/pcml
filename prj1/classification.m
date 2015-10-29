@@ -7,18 +7,18 @@ for i = unique(X_train(:,8))'
     X_train(:,size(X_train, 2)+1) = (X_train(:,8) == i);
 end
 
-[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.7);
-[XTr, XTr_mean, XTr_std] = normalize(XTr);
-XTe = adjust(XTe, XTr_mean, XTr_std);
+[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.9);
+%[XTr, XTr_mean, XTr_std] = normalize(XTr);
+%XTe = adjust(XTe, XTr_mean, XTr_std);
 tXTr = [ones(size(XTr, 1), 1) XTr];
 tXTe = [ones(size(XTe, 1), 1) XTe];
 
-lrBeta = logisticRegression(yTr, tXTr, 0.001);
+lrBeta = logisticRegression(yTr, tXTr, 1e-7);
 
 lrY = sigmoid(tXTe * lrBeta) > 0.5;
 logisticRegressionTestError = sum(lrY ~= yTe)/size(yTe, 1)
 
-K = 4;
+K = 7;
 N = size(yTr, 1);
 idx = randperm(N);
 Nk = floor(N/K);
@@ -27,7 +27,7 @@ for k = 1:K
     idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
 end;
 
-%{
+
 for i = 1:size(tXTr,2)
     errorTeSub = zeros(K, 1);
     errorTrSub = zeros(K, 1);
@@ -47,11 +47,12 @@ nfBeta = logisticRegression(yTr, tXTr(:, [1:iStar-1 iStar+1:end]), 0.001);
 noFeatureTestError = sum((sigmoid(tXTe(:, [1:iStar-1 iStar+1:end]) * nfBeta) > 0.5) ~= yTe)/size(yTe,1)
 
 plot(errorTe);
-%}
+
 
 %{
-mvals = [1 2 3];
-lvals = logspace(-2, 2, 8);
+
+mvals = [1 2];
+lvals = logspace(-2, 2, 4);
 
 errorTeSub = zeros(K,1);
 errorTrSub = zeros(K,1);
@@ -62,8 +63,12 @@ for j = 1:length(mvals)
         lambda = lvals(l);
         for k = 1:K
             [yTrTe, yTrTr, pXTrTe, pXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
-        
-            beta = penLogisticRegression(yTrTr, pXTrTr, 0.00002, lambda);
+            
+            if (m == 1)
+                beta = penLogisticRegression(yTrTr, pXTrTr, 1e-6, lambda, 1e-5);
+            else
+                beta = penLogisticRegression(yTrTr, pXTrTr, 1e-12, lambda, 1e-5);
+            end;
             errorTeSub(k) = sum((sigmoid(pXTrTe*beta) > 0.5) ~= yTrTe)/size(yTrTe,1);
             errorTrSub(k) = sum((sigmoid(pXTrTr*beta) > 0.5) ~= yTrTr)/size(yTrTr,1);
         end;

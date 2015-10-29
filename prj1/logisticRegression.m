@@ -11,22 +11,31 @@ function [ beta ] = logisticRegression( y, tX, alpha )
   % Termination metrics. The loop terminates either when two consequent
   % L values are closer than epsilon, or after maxIters iterations,
   % whicever happens earlier.
-  maxIters = 1000000;
+  maxIters = 100000;
   epsilon = 1e-5;
   
   for k = 1:maxIters
-     [L, g] = logisticRegLoss(beta, tX, y);
-     beta = beta - alpha*g;
+      [L, g] = logisticRegLoss(beta, tX, y);
+      beta = beta - alpha*g;
      
-     if (k > 1)
-         % Check for the termination condition: L changed insignificantly.
-         converged = abs(L_prev - L) < epsilon;
-         if(converged)
-             break;
-         end;
-     end;
-     L_prev = L; % Remember the last iteration L for the termination check.
+      if (k > 1)
+          % Check for the termination condition: L changed insignificantly.
+          delta = L_prev - L;
+          converged = abs(delta) < epsilon;
+          if(converged)
+              return;
+          end;
+          if (L == Inf)
+              disp('Loss is infinite');
+              break;
+          end;
+          if (L > L_prev)
+              disp('warning: increasing loss');
+          end;
+      end;
+      L_prev = L; % Remember the last iteration L for the termination check.
   end;
+  fprintf('%d. logistic regression did not converge (%d; %d)\n', k, L, delta);
   
 end
 

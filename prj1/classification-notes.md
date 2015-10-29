@@ -15,3 +15,12 @@
  - for 9-th - 0.1044
  - for 10-th - 0.1044
  - for 17-th - 0.1067 - the same untouched data error.
+8) OMG: I had unconverged penalized logistic regression everywhere!
+
+# Change the split seed: from 1 to 18.
+New logistic regression test error: 0.1356
+
+# Change the split ratio from 0.7 to 0.9
+New logistic regression test error: 0.1133
+
+~ Numerical problem: for x >= 710, matlab considers exp(x) = Inf => log(1+exp(x)) = Inf, which is unfortunate. So let's better approximate log(1+exp(x)).
