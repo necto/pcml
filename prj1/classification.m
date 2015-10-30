@@ -1,5 +1,12 @@
-clear all;
+if (exist('reportMode', 'var') == 1)
+    forReport = true;
+else
+    forReport = false;
+    clear all;
+end;
+
 load('data/classification.mat');
+
 
 y_train = (y_train + 1)/2; % !!! remember invert that for predictions
 
@@ -84,7 +91,7 @@ end;
 
 % TODO: choose the right low and high borders to produce a nice-looking
 % graph.
-lvals = logspace(-1, 4, 100);
+lvals = logspace(0, 4, 200);
 
 for l = 1:length(lvals)
     lambda = lvals(l);
@@ -125,9 +132,19 @@ plot(lvals, errorTr*100, 'r');
 %plot(lvals, errorTT, 'g');
 set(gca,'XScale', 'log');
 title('Misprediction errors for penalized logistic regression.');
-xlabel('Penalizer coefficient \lambda');
-ylabel('Misprediction fraction (%)');
-legend('Test error', 'Training error');
+hx = xlabel('Penalizer coefficient lambda');
+hy = ylabel('Misprediction fraction (%)');
+legend('Test error', 'Training error', 'Location', 'northwest');
+set(gca,'fontsize',13,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
+set([hx; hy],'fontsize',13,'fontname','avantgarde','color',[.3 .3 .3]);
+grid on;
 
+if (forReport)
+    disp('printing the figure');
+    set(gcf, 'PaperUnits', 'centimeters');
+    set(gcf, 'PaperPosition', [0 0 20 20]);
+    set(gcf, 'PaperSize', [20 20]);
+    print -dpdf 'report/figures/penLLmisses.pdf'
+end;
 
 
