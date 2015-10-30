@@ -4,15 +4,14 @@
 % local minimum of the logistic function.
 % Returns the beta that approximates y good enough if a reasonable amount
 % of iterations is enough to reach it.
-function [ beta ] = logisticRegression( y, tX, alpha )
+function [ beta ] = logisticRegression( y, tX, alpha, epsilon)
   % Set the start values to begin with.
   beta = ones(size(tX,2), 1)*1e-3;
   
   % Termination metrics. The loop terminates either when two consequent
   % L values are closer than epsilon, or after maxIters iterations,
   % whicever happens earlier.
-  maxIters = 100000;
-  epsilon = 1e-5;
+  maxIters = 500000;
   
   for k = 1:maxIters
       [L, g] = logisticRegLoss(beta, tX, y);

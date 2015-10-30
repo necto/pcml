@@ -6,7 +6,7 @@ function [ beta ] = penLogisticRegression(y, tX, alpha, lambda, epsilon)
   
   % Stop when the difference between two L is less than epsilon or 
   % after maxIters iterations
-  maxIters = 100000;
+  maxIters = 500000;
   
   for k = 1:maxIters
       [L, g] = penLogisticRegLoss(beta, tX, y, lambda);

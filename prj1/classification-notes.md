@@ -24,3 +24,5 @@ New logistic regression test error: 0.1356
 New logistic regression test error: 0.1133
 
 ~ Numerical problem: for x >= 710, matlab considers exp(x) = Inf => log(1+exp(x)) = Inf, which is unfortunate. So let's better approximate log(1+exp(x)).
+
+10) feature-removal: Finally I can see in the X-validation, that it does not help.

@@ -1,6 +1,9 @@
+% Shuffle and split the given data (X, y) into two groups: test (XTe, yTe)
+% and training (XTr, yTr) with the given ratio:
+% prop = length(yTe)/(length(yTe) + length(yTr)).
 function [XTr, yTr, XTe, yTe] = split(y, X, prop)
 % split the data into train and test given a proportion
-    setSeed(18);
+    setSeed(42);
     N = size(y,1);
     % generate random indices
     idx = randperm(N);
@@ -16,7 +19,8 @@ function [XTr, yTr, XTe, yTe] = split(y, X, prop)
 end
 
 function setSeed(seed)
-% set seed
+% set the random number generator seed. Use it for reproducibility of pseudo
+% random numbers.
 	global RNDN_STATE  RND_STATE
 	RNDN_STATE = randn('state');
 	randn('state',seed);
