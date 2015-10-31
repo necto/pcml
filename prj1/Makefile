@@ -2,6 +2,10 @@
 test:
 	matlab -nodesktop -nosplash -nojvm -r 'testCode;quit'
 
+report/figures/penLLmisses.pdf: *.m
+	mkdir -p report/figures
+	matlab -nodesktop -nosplash -nodisplay -r 'reportMode=true;classification;quit'
+
 report/report.pdf: report/report.tex
 	cd report
 	pdflatex report.tex

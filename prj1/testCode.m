@@ -40,7 +40,7 @@ y = (y>0);
 % testing logistic regression
 disp('logistic regression...');
 alpha = 1e-3; % 1e-4
-tBeta = logisticRegression(y,tX,alpha);
+tBeta = logisticRegression(y,tX,alpha, 1e-5);
 tY = 1.0 ./ (1.0 + exp(-tX * tBeta)) > 0.5;
 assert(sum(tY ~= y) / size(y,1) < 0.2);
 disp('OK!');
@@ -57,7 +57,7 @@ disp('OK!');
 disp('penalized logistic regression...');
 alpha = 1e-3;
 lambda = 1e-2;
-tBeta = penLogisticRegression(y,tX,alpha,lambda);
+tBeta = penLogisticRegression(y,tX,alpha,lambda,1e-5);
 tY = 1.0 ./ (1.0 + exp(-tX * tBeta)) > 0.5;
 assert(sum(tY ~= y) / size(y,1) < 0.2);
 disp('OK!');
