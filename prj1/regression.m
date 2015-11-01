@@ -2,11 +2,16 @@ clear all;
 close all;
 load('data/regression.mat');
 
+%% Remove outliers
+outliers = getOutliers(X_train);
+X_train = X_train(outliers==0,:);
+y_train = y_train(outliers==0);
+
 %% Enable dummy coding for X_train columns [2,12,14,29,48,62]
-%X_train = dummyCoding(X_train, [2,12,14,29,48,62]);
+X_train = dummyCoding(X_train, [2,12,14,29,48,62]);
 
 %% Split data into train and validation sets
-[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.7, 42);
+[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.8, 42);
 % Normalize data
 [XTr, XTr_mean, XTr_std] = normalize(XTr);
 XTe = adjust(XTe, XTr_mean, XTr_std);
@@ -23,7 +28,7 @@ idxCV = zeros(K, Nk);
 for k = 1:K
     idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
 end;
-
+%{
 %% Linear regression using gradient descent
 disp('Linear regression using gradient descent');
 errorTeSub = zeros(K, 1);
@@ -60,6 +65,12 @@ tXTr3 = tXTr(yTr>=10000,:);
 yTr3 = yTr(yTr>=10000,:);
 figure;
 plot(tXTr1(:,58),yTr1,'o',tXTr2(:,58),yTr2,'o',tXTr3(:,58),yTr3,'o');
+title('Scatter plot of tX\_train vs y\_train');
+hx = xlabel('tX\_train (column 58)');
+hy = ylabel('y\_train');
+set(gca,'fontsize',13,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
+set([hx; hy],'fontsize',13,'fontname','avantgarde','color',[.3 .3 .3]);
+print -dpdf cluster.pdf
 figure;
 plot(tXTr1(:,43),yTr1,'o',tXTr2(:,43),yTr2,'o',tXTr3(:,43),yTr3,'o');
 
@@ -105,17 +116,13 @@ for i = 1:length(th1)
 end
 rmseTr = sqrt(2*mean(errorTrSub))
 rmseTe = sqrt(2*mean(errorTeSub))
-rmseT = sqrt(2*mean(errorTeXSelect))
-%%%%%%%%% Pause %%%%%%%%%
-pause;
-
-
+rmseT = min(min(err))
+%}
 %% Ridge regression using normal equations
 disp('Ridge regression using normal equations');
 degree = 2;
-lvals = logspace(-1, 1, 10);
+lvals = logspace(1,4,10);
 pXTr = [ones(size(XTr, 1), 1) myPoly(XTr, degree)];
-
 for l = 1:length(lvals)
     lambda = lvals(l);
     
@@ -125,11 +132,15 @@ for l = 1:length(lvals)
         [yTrTe, yTrTr, ptXTrTe, ptXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
         
         beta = ridgeRegression(yTrTr, ptXTrTr, lambda);
-        
+        %yyy = ptXTrTe*beta;
         errorTeSub(k) = computeCost(yTrTe,ptXTrTe,beta);
         errorTrSub(k) = computeCost(yTrTr,ptXTrTr,beta);
     end;
     errorTe(l) = mean(errorTeSub);
     errorTr(l) = mean(errorTrSub);
 end;
-[errStar lStar] = min(errorTe)
+figure;
+plot(lvals,errorTe)
+
+[errTeStar lTeStar] = min(errorTe)
+[errTrStar lTrStar] = min(errorTr)

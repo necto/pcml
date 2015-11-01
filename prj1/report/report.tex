@@ -45,16 +45,38 @@ EPFL \\
 
 \begin{abstract}
 \todo{Discuss and write down the chapter-wise structure of the report.}
+
 \end{abstract}
 
 \section{Data Description}
 \todo{probably this one shold remain present.}
+\paragraph{Regression} The dataset for the regression part of this project contains a training set and a test set. Our training set contains 2800 pairs $(X\_train, y\_train)$. The dimensionality D of X\_train is 66 and it includes 54 real, 6 binary and 6 categorical variables with a number of categories between 3 and 4.
+We also get a test set $X_test$ of 1200 data examples for which we have to predict the output y as well as the expected RMSE for our best model.
+
 
 \section{Data visualization and cleaning}
 \todo{normalization}
 \todo{\{-1, 1\} to \{0, 1\}}
 \todo{this works as an addition to the previous one.}
 % A figure reference example: Figure \ref{fig:boxplotX}
+
+\begin{figure}[h]	
+	\centering
+	\includegraphics[width=0.9\textwidth]{cluster.pdf}
+	\caption{Scatter plot of input vs output}
+	\label{fig:scatterIO}
+\end{figure}
+As we can see on figure \ref{fig:scatterIO}, the data point are grouped into 3 different clusters.
+
+
+% An example embedded plot:
+%\begin{figure}[!t]
+%\center
+%\subfigure[Boxplot of real-valued $\mathbf{X}$. Data is not centered and therefore we normalize it.]{\includegraphics[width=2.5in]{figures/boxplotX.pdf} \label{fig:boxplotX}}
+%\hfill
+%\subfigure[Histogram of $\mathbf{y}$. We can clearly see two outliers.]{\includegraphics[width=2.5in]{figures/histY.pdf} \label{fig:histY}}
+%\caption{}
+%\end{figure}
 
 \section{Regression}
 \subsection{Feature transformations}

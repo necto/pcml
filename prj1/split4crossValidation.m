@@ -1,7 +1,5 @@
+% Split the data into train and validation sets
 function [ yTe, yTr, XTe, XTr ] = split4crossValidation( k, idxCV, y, X )
-%UNTITLED4 Summary of this function goes here
-%   Detailed explanation goes here
-
     idxTe = idxCV(k, :);
     idxTe = idxTe(:);
     idxTr = idxCV([1:k-1 k+1:end],:);
