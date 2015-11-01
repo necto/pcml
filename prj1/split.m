@@ -1,9 +1,11 @@
 % Shuffle and split the given data (X, y) into two groups: test (XTe, yTe)
 % and training (XTr, yTr) with the given ratio:
 % prop = length(yTe)/(length(yTe) + length(yTr)).
-function [XTr, yTr, XTe, yTe] = split(y, X, prop)
+% The last parameter if the rundom number generator seed for shuffling the
+% data.
+function [XTr, yTr, XTe, yTe] = split(y, X, prop, seed)
 % split the data into train and test given a proportion
-    setSeed(42);
+    setSeed(seed);
     N = size(y,1);
     % generate random indices
     idx = randperm(N);

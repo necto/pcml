@@ -4,14 +4,19 @@ test:
 
 report/figures/penLLmisses.pdf: *.m
 	mkdir -p report/figures
-	matlab -nodesktop -nosplash -nodisplay -r 'reportMode=true;classification;quit'
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='penLogReg';classification;quit"
 
-report/report.pdf: report/report.tex
-	cd report
-	pdflatex report.tex
-	cd ..
+report/figures/polyLogLoss.pdf: *.m
+	mkdir -p report/figures
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='polynomial';classification;quit"
 
-istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_classification.csv test_errors_classification.csv report.pdf *.m
+predictions_classification.csv test_errors_classification.csv: *.m
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='logReg';classification;quit"
+
+report/report.pdf: report/report.tex report/figures/penLLmisses.pdf report/figures/polyLogLoss.pdf
+	cd report && pdflatex report.tex
+
+istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_classification.csv test_errors_classification.csv report/report.pdf *.m
 	mkdir -p submission
 	cp leastSquaresGD.m submission/
 	cp leastSquares.m submission/
@@ -25,10 +30,12 @@ istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_
 	cp test_errors_regression.csv submission/
 	cp predictions_classification.csv submission/
 	cp test_errors_classification.csv submission/
-	cp report.pdf submission/
+	cp report/report.pdf submission/
 	zip -r istanbul.zip submission
 
 package: istanbul.zip
 
 clean:
 	rm predictions_classification.csv
+	rm report/figures/*.pdf
+	rm report/*.log report/*.out report/*.pdf

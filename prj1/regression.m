@@ -6,7 +6,7 @@ load('data/regression.mat');
 %X_train = dummyCoding(X_train, [2,12,14,29,48,62]);
 
 %% Split data into train and validation sets
-[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.7);
+[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.7, 42);
 % Normalize data
 [XTr, XTr_mean, XTr_std] = normalize(XTr);
 XTe = adjust(XTe, XTr_mean, XTr_std);
