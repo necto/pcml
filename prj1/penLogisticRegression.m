@@ -8,20 +8,32 @@ function [ beta ] = penLogisticRegression(y, tX, alpha, lambda, epsilon)
   % after maxIters iterations
   maxIters = 500000;
   
+  tendence = false;
   for k = 1:maxIters
       [L, g] = penLogisticRegLoss(beta, tX, y, lambda);
       beta = beta - alpha * g;
       % Check convergence
       if(k > 1)
           delta = L_prev - L;
-          if(abs(delta)/L < epsilon) return; end; 
+          if(abs(delta)/L < epsilon)
+              if (tendence)
+                  if (k < 4)
+                      disp('warning: penLogisticRegresssion converged too fast');
+                  end;
+                  return;
+              else
+                  tendence = true;
+              end;
+          else
+              tendence = false;
+          end;
           if (L == Inf)
               disp('Loss is infinite');
               break;
           end;
           if (L > L_prev)
               disp('warning: increasing loss');
-          end
+          end;
       end;
       L_prev = L; % Remember the last iteration L for the termination check.
   end;

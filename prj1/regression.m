@@ -10,8 +10,11 @@ y_train = y_train(outliers==0);
 %% Enable dummy coding for X_train columns [2,12,14,29,48,62]
 X_train = dummyCoding(X_train, [2,12,14,29,48,62]);
 
+%% Feature removal
+X_train = X_train(:,[51 69]);
+
 %% Split data into train and validation sets
-[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.8);
+[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.8, 42);
 % Normalize data
 [XTr, XTr_mean, XTr_std] = normalize(XTr);
 XTe = adjust(XTe, XTr_mean, XTr_std);
@@ -28,7 +31,7 @@ idxCV = zeros(K, Nk);
 for k = 1:K
     idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
 end;
-%{
+
 %% Linear regression using gradient descent
 disp('Linear regression using gradient descent');
 errorTeSub = zeros(K, 1);
@@ -54,7 +57,7 @@ for k = 1:K
 end
 rmseTr = sqrt(2*mean(errorTrSub))
 rmseTe = sqrt(2*mean(errorTeSub))
-
+%{
 %% Separate data into three different models
 % Seperate data into 3 clouds
 tXTr1 = tXTr(yTr<=5500,:);
@@ -120,13 +123,13 @@ rmseT = min(min(err))
 %}
 %% Ridge regression using normal equations
 disp('Ridge regression using normal equations');
-degree = 2;
-lvals = 4199.42:0.005:4199.44;
+degree = 3;
+lvals = logspace(2,2.5,1000);
 pXTr = [ones(size(XTr, 1), 1) myPoly(XTr, degree)];
 for l = 1:length(lvals)
     lambda = lvals(l);
     %if mod(l,10)==0;
-      disp('tic');
+      %disp('tic');
     %end
     errorTeSub = zeros(K,1);
     errorTrSub = zeros(K,1);
