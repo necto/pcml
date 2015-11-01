@@ -121,11 +121,13 @@ rmseT = min(min(err))
 %% Ridge regression using normal equations
 disp('Ridge regression using normal equations');
 degree = 2;
-lvals = logspace(1,4,10);
+lvals = 4199.42:0.005:4199.44;
 pXTr = [ones(size(XTr, 1), 1) myPoly(XTr, degree)];
 for l = 1:length(lvals)
     lambda = lvals(l);
-    
+    %if mod(l,10)==0;
+      disp('tic');
+    %end
     errorTeSub = zeros(K,1);
     errorTrSub = zeros(K,1);
     for k = 1:K
@@ -144,3 +146,5 @@ plot(lvals,errorTe)
 
 [errTeStar lTeStar] = min(errorTe)
 [errTrStar lTrStar] = min(errorTr)
+rmseTe = sqrt(2*errTeStar)
+rmseTr = sqrt(2*errTrStar)

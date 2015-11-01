@@ -50,13 +50,20 @@ EPFL \\
 
 \section{Data Description}
 \todo{probably this one shold remain present.}
-\paragraph{Regression} The dataset for the regression part of this project contains a training set and a test set. Our training set contains 2800 pairs $(X\_train, y\_train)$. The dimensionality D of X\_train is 66 and it includes 54 real, 6 binary and 6 categorical variables with a number of categories between 3 and 4.
-We also get a test set $X_test$ of 1200 data examples for which we have to predict the output y as well as the expected RMSE for our best model.
-
+\paragraph{Regression} For the regression part of this project we received a dataset containing three named $\boldmath{X\_train, y\_train}$ and $\boldmath{X\_test}$. The pairs $\boldmath{X\_train, y\_train}$  form our training set. 
+The former contains N = 2800 sample of dimensionality D = 66 and includes 54 real, 6 binary and 6 categorical variables with a number of categories between 3 and 4.
+The later contains 2800 real variables that represent the output of $\boldmath{X\_train}$ .
+We also get a test set $X\_test$ of 1200 data examples for which we have to predict the output $\boldmath{y}$ as well as the expected RMSE for our best model.
 
 \section{Data visualization and cleaning}
 \todo{this works as an addition to the previous one.}
 % A figure reference example: Figure \ref{fig:boxplotX}
+\paragraph{Regression set} The dataset for the regression part was analyzed.
+We can notice that there are some outliers, so we build a function to remove them and later we will see if this improve the accuracy of our model.
+Secondly we noticed that we need to normalized the input data because their distributions are not centered.
+Another interesting observation is the distribution of the output $\boldmath{y\_train}$ that is shown on figure \ref{fig:histogramY_train}.
+
+We investigated if dummy coding of the categorical variable can improve the results.
 
 \begin{figure}[h]	
 	\centering
