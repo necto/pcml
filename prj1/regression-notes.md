@@ -1,3 +1,7 @@
+1) We have a typical learning curve for High bias: The training error is unacceptably high and
+there is a small gap between training and test error.
+
+
 1) Test leastSquare with gradient descent with normalized features.
 rmseTe = 1.3683e+03 rmseTr = 1.3683e+03
 2) Test Least squares using normal equations. The matrix X is ilconditioned 
