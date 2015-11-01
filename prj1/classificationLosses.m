@@ -1,4 +1,5 @@
-% Compute the three required error metrics for classification model.
+% Compute the three required error metrics for the classification model
+% beta and data (X, y).
 function [ RMSE, zeroOne, logLoss ] = classificationLosses( X, beta, y )
     prediction = sigmoid(X*beta);
     N = length(y);
