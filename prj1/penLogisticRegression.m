@@ -8,6 +8,7 @@ function [ beta ] = penLogisticRegression(y, tX, alpha, lambda, epsilon)
   % after maxIters iterations
   maxIters = 500000;
   
+  % Keeps whether the last iteration was slowing down.
   tendence = false;
   for k = 1:maxIters
       [L, g] = penLogisticRegLoss(beta, tX, y, lambda);
@@ -15,14 +16,18 @@ function [ beta ] = penLogisticRegression(y, tX, alpha, lambda, epsilon)
       % Check convergence
       if(k > 1)
           delta = L_prev - L;
+          % Check if the progress has slown down, meaning that we are close
+          % to a local optimum.
           if(abs(delta)/L < epsilon)
-              if (tendence)
+              if (tendence) % Make sure it is not by a chance
+                  % Check that we iterated enough, and not just happend to
+                  % start at an optimum.
                   if (k < 4)
                       disp('warning: penLogisticRegresssion converged too fast');
                   end;
                   return;
               else
-                  tendence = true;
+                  tendence = true; % If this situation repeats, we can stop.
               end;
           else
               tendence = false;
@@ -37,6 +42,8 @@ function [ beta ] = penLogisticRegression(y, tX, alpha, lambda, epsilon)
       end;
       L_prev = L; % Remember the last iteration L for the termination check.
   end;
+  % even maxIters was not enough to satisfy the epsilon-condition. Probably
+  % you should enlarge alpha, or epsilon.
   fprintf('penalized logistic regression did not converge (%d;%d)\n', L, delta);
 end
 

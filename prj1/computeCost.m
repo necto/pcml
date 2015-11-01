@@ -1,3 +1,4 @@
+% Linear regression loss function.
 function [ L ] = computeCost( y, tX, beta )
     N = length(y);
     %compute error
