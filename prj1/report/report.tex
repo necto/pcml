@@ -14,6 +14,10 @@
 \usepackage{ifthen}
 \usepackage{natbib}
 \usepackage{color}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{geometry}
+
 
 \title{Project-I by Group Istanbul}
 
@@ -44,8 +48,9 @@ EPFL \\
 \maketitle
 
 \begin{abstract}
-\todo{Discuss and write down the chapter-wise structure of the report.}
-
+In this report we describes our result for the first project of the PCML class.
+We start by doing some basic exploratory data analysis on our data, then we implement regression and classification methods to analyze and predict data.
+Finally we experimented with feature engineering and processing with the goal of improving the accuracy of our models.
 \end{abstract}
 
 \section{Data Description}
@@ -60,42 +65,26 @@ We also get a test set $X\_test$ of 1200 data examples for which we have to pred
 \todo{\{-1, 1\} to \{0, 1\}}
 \todo{this works as an addition to the previous one.}
 % A figure reference example: Figure \ref{fig:boxplotX}
-\paragraph{Regression set} The dataset for the regression part was analyzed.
-By looking at the histograms of the input variables, we notice that there are some outliers. A function was build to remove those and the rmse for the different methods improve slightly.
+
+The first step is to perform exploratory data analysis on the regression and classification datasets.
+\paragraph{Regression} 
+By looking at the histograms of the input variables, we notice that there are some outliers. By removing them the rmse decrease slightly.
 For example with leastSquares it decreases from 1378.8 to 1370.4.
 
-Secondly we noticed that we need to normalize the input data because their distributions are not centered.
+Secondly we notice that we need to normalize the input data because their distributions are not centered.
 
-Another interesting observation is the distribution of the output $\boldmath{y\_train}$ that is shown on figure \ref{fig:histogramY_train}.
+Another interesting observation is the distribution of the output $\boldmath{y\_train}$ that is shown on figure \ref{fig:histY}.
+We clearly see that the data are separated into 3 groups.
 
-By looking at the correlation between the input variables and the output we see that out of the 66 input variables, two have a high correlation with the output.
-\begin{figure*}[t!]
+We also look into the correlation between input variables and the output. We see that out of the 66 input variables, two have a high correlation with the output.
+\begin{figure}[!t]
 	\centering
-	\begin{subfigure}[t]{0.5\textwidth}
-		\centering
-		\includegraphics[height=1.2in]{figures/cluster.pdf}
-		\caption{Scatter plot of input vs output}\label{fig:scatterIO}
-	\end{subfigure}%
-	~ 
-	\begin{subfigure}[t]{0.5\textwidth}
-		\centering
-		\includegraphics[height=1.2in]{figures/histY.pdf}
-		\caption{Lorem ipsum, lorem ipsum,Lorem ipsum, lorem ipsum,Lorem ipsum}
-	\end{subfigure}
-	\caption{Caption place holder}
-\end{figure*}
-
+	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=60mm]{figures/cluster.pdf}}
+	\subfigure[Histogram of y\_train]{\label{fig:histY}\includegraphics[width=60mm]{figures/histY.pdf}}
+	\caption{Data analysis}
+\end{figure}
 As we can see on figure \ref{fig:scatterIO}, the data point are grouped into 3 different clusters.
 
-
-% An example embedded plot:
-%\begin{figure}[!t]
-%\center
-%\subfigure[Boxplot of real-valued $\mathbf{X}$. Data is not centered and therefore we normalize it.]{\includegraphics[width=2.5in]{figures/boxplotX.pdf} \label{fig:boxplotX}}
-%\hfill
-%\subfigure[Histogram of $\mathbf{y}$. We can clearly see two outliers.]{\includegraphics[width=2.5in]{figures/histY.pdf} \label{fig:histY}}
-%\caption{}
-%\end{figure}
 
 \section{Regression}
 To  estimate the rmse of our model with the data in hand, we split them into training and validation sets (80\% as training data and 20\% as validation) and pretend validation set is the future data.
@@ -201,7 +190,7 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 
 \begin{figure}[!t]
 \center
-%\includegraphics[width=6in]{figures/penLLmisses.pdf}
+\includegraphics[width=6in]{figures/penLLmisses.pdf}
 \caption{Penalized logistic regression, ran on the original set of 24 features.}
 \label{fig:penLLmisses}
 \end{figure}
@@ -209,7 +198,7 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 
 \begin{figure}[!t]
 \center
-%\includegraphics[width=6in]{figures/polyLogLoss.pdf}
+\includegraphics[width=6in]{figures/polyLogLoss.pdf}
 \caption{\todo{Polygon.}}
 \label{fig:polyErrors}
 \end{figure}

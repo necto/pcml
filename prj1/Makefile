@@ -10,8 +10,27 @@ report/figures/polyLogLoss.pdf: *.m
 	mkdir -p report/figures
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='polynomial';classification;quit"
 
+report/figures/histY.pdf: *.m
+	mkdir -p report/figures
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
+
+report/figures/CorrelationXY.pdf: *.m
+	mkdir -p report/figures
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
+
+report/figures/X58vsY.pdf: *.m
+	mkdir -p report/figures
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
+
+report/figures/X43vsY.pdf: *.m
+	mkdir -p report/figures
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
+
 predictions_classification.csv test_errors_classification.csv: *.m
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='logReg';classification;quit"
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';classification;quit"
+
+predictions_regression.csv test_errors_regression.csv: *.m
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
 
 report/report.pdf: report/report.tex report/figures/penLLmisses.pdf report/figures/polyLogLoss.pdf
 	cd report && pdflatex report.tex
