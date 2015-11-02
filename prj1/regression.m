@@ -98,7 +98,7 @@ end;
 if (strcmp(stage, 'ridgeReg'))
   disp('Ridge regression using normal equations');
   mvals = [2];
-  lvals = logspace(1,5,15);
+  lvals = logspace(1,5,20);
   
   errorTe = zeros(K, 1);
   errorTr = zeros(K, 1);

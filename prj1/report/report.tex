@@ -160,6 +160,7 @@ In Table \ref{tab:regression-errors} we see that both Least Squares and Least Sq
 For our dataset, Ridge regression performance is worse than Least Squares.
 Figure \ref{fig:ridgeRegError} shows the results obtained with ridge regression for a polynomial of degree 2 and a training set of 90\% of the data, the rest being the testing set. $\lambda$ varies from $10$ to $10^{5}$ with a total of 20 points in between. 
 There is only 20 points because the computation is expensive. Indeed with a degree 2, we have 4356 features and 287496 for degree 3.
+On the plot we can see that the RMSE min is around 1650 for a $\lambda$ of $10^{3}$.
 
 \begin{figure}[!t]
 	\center
@@ -179,6 +180,14 @@ Secondly, we tried dummy coding of the categorical variables.
 As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
 We apply dummy coding to each of these variables and compute the new RMSE.
 Table \ref{tab:regression-dummy} shows that again there is no improvements.
+
+For the regression part we tried a last approach.
+Figure \ref{fig:scatter} and \ref{fig:histY} show that the data are separated into three clusters. And there is a high correlation between variables number 42, 57 and the output.
+We tried to define 3 models, one for each cluster. 
+When we want to make a prediction for a new input, we have to first decide which model we have to use.
+We did this by looking at the features number 42 and 57. 
+For example in figure \ref{fig:scatter} we can guess which points belong to the yellow cloud by looking at the feature 57 of X\_train, because the yellow cluster is separated from the two others. We can do the same for the blue cloud with the feature 42.
+Unfortunately the RMSE was not better than least square.
 
 \section{Classification}
 
