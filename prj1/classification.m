@@ -121,7 +121,7 @@ end;
 if (strcmp(stage, 'polynomial'))
     mvals = [2];
     alphas = [1e-4];
-    lvals = logspace(-3, 0, 7);
+    lvals = logspace(-3, 0, 70);
 
     errorTeSub = zeros(K,1);
     errorTrSub = zeros(K,1);
@@ -181,7 +181,7 @@ end;
 
 %% Penalized logistic regression
 if (strcmp(stage, 'penLogReg'))
-    lvals = logspace(-7, -1, 10);
+    lvals = logspace(-7, -1, 100);
 
     for l = 1:length(lvals)
         lambda = lvals(l);
