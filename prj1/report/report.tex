@@ -2,7 +2,7 @@
 % We will use NIPS submission format
 \usepackage{nips13submit_e,times}
 % for hyperlinks
-\usepackage{hyperref}
+%\usepackage{hyperref}
 \usepackage{url}
 % For figures
 \usepackage{graphicx} 
@@ -56,24 +56,23 @@ Finally we experimented with feature engineering and processing with the goal of
 \section{Data Description}
 
 \paragraph{Regression} For the regression part of this project we received a dataset containing three sets named $\boldmath{X\_train, y\_train}$ and $\boldmath{X\_test}$. The pairs $\boldmath{X\_train, y\_train}$  form our training set. 
-The former contains N = 2800 sample of dimensionality D = 66 and includes 54 real, 6 binary and 6 categorical variables with a number of categories between 3 and 4.
+The former contains N = 2800 samples of dimensionality D = 66 and includes 54 real, 6 binary and 6 categorical variables with a number of categories between 3 and 4.
 The later contains 2800 real variables that represent the output of $\boldmath{X\_train}$ .
 We also get a test set $X\_test$ of 1200 data examples for which we have to predict the output $\boldmath{y}$ as well as the expected RMSE for our best model.
 
 \paragraph{Classification} The dataset for the classification part of this project is quite similar to the first one.
 There is also three sets named $\boldmath{X\_train, y\_train}$ and $\boldmath{X\_test}$. 
 The pairs $\boldmath{X\_train, y\_train}$  form our training set. 
-The former contains N = 1500 sample of dimensionality D = 24 and includes 20 real, 1 binary and 3 categorical variables with a number of categories varying between 4 and 5.
-The later contains 1500 binary variables that represent the two classes in which the inputs belong.
+The former contains N = 1500 samples of dimensionality D = 24 and includes 20 real, 1 binary and 3 categorical variables with a number of categories varying between 4 and 5.
+The later contains 1500 binary variables that represent the two classes $\{-1, 1\}$ in which the inputs belong.
 We also get a test set $X\_test$ of 1200 data examples and our goal is to predict in which class they belong.
 
 \section{Data visualization and cleaning}
-\todo{normalization}
-\todo{\{-1, 1\} to \{0, 1\}}
-\todo{this works as an addition to the previous one.}
-% A figure reference example: Figure \ref{fig:boxplotX}
 
 The first step is to perform exploratory data analysis on the regression and classification datasets.
+
+\emph{Note:} For all analyses that require cross-validation we use 7 folds. 
+
 \paragraph{Regression} 
 By looking at the histograms of the input variables, we notice that there are some outliers (41 to be exact). 
 By removing them the rmse decrease slightly.
@@ -87,7 +86,10 @@ We clearly see that the data are separated into 3 groups.
 We also look into the correlation between input variables and the output. We see that out of the 66 input variables, two have a high correlation with the output.
 
 The input matrix $\boldmath{X}$ is rank deficient with a rank of 55 instead of 66. This can lead to numerical issues when using methods such as least squares.
-We can fight ill-conditioning with ridge regression. The method is refer to as \textit{lifting the eigenvalues}. 
+We can fight ill-conditioning with ridge regression. The method is refer to as \textit{lifting the eigenvalues}.
+
+\paragraph{Classification}
+The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we apply a simple transformation: ${(y + 1)\over 2} \in \{0, 1\}$. Another observation is that the standard deviation of different dimensions varies significantly: from 0.5 upto 874, so we normalize the input data, to get rid of the scale bias. Finally we add a constant feature $X_0 \equiv 1$.
 
 \begin{figure}[!t]
 	\centering
@@ -98,8 +100,6 @@ We can fight ill-conditioning with ridge regression. The method is refer to as \
 
 \section{Regression}
 To  estimate the rmse of our model with the data in hand, we split them into training and validation sets (90\% as training data and 10\% as validation) and pretend validation set is the future data.
-
-For all regression analyses, 7-fold cross-validation is used.
 
 We stared by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
 
@@ -155,9 +155,7 @@ As explained in the "Data description section, the regression set's input has 6 
 
 Before getting into the analysis, we first shuffle the data by pseudo-rundom permutation to get rid of inherent ordering, that might bias the model. We also average the results over a range of rundom number generator seeds. We use In order to evaluate our final model later we cut off 10\% of the training data (150 points) to simulate the unseen future input.
 
-For all classification analyses we use 7-fold cross-validation. 
-
-We started with the classical logistic regression \todo{Newton?}, and tried to improve the obtained result using penalized logistic regression and various feature transformations. The best errors for each method are shown in the Table~\ref{tab:classification-errors}. The rest of this section describes the details of each of them. The baseline -- trivial constant majority-based prediction is also shown for a reference.
+We started with the classical logistic regression, and tried to improve the obtained result using penalized logistic regression and various feature transformations. The best errors for each method are shown in the Table~\ref{tab:classification-errors}. The rest of this section describes the details of each of them. The baseline -- trivial constant majority-based prediction is also shown for a reference.
 \begin{table}[h]
   \begin{center}
     \begin{tabular}{l|ccc}
@@ -201,27 +199,20 @@ Having failed to reduct the feature set, we started expanding it, as our logisti
 
 The last transformation tried is {\bf polynomial}. Monomial basis can theoretically approximate any function. We generate a full polynom, which means 625 features for second degree and 15625 -- for the third, which is substentially greater than the number of training data points, so due to the curse of dimensionality, the regression is unable to fit a satisfactory model. Therefore we tested only the second degree. We used cross validation with penalized logistic regression to supress the high variance of 625 features. In the Fig.~\ref{fig:polyErrors} you can see the plot of logLoss function for the polynomial of the second degree. The other two metrics for the given random seed again do not have a bell form.
 
-\begin{figure}[!t]
+\begin{figure}[h]
 \center
-\includegraphics[width=6in]{figures/penLLmisses.pdf}
-\caption{Penalized logistic regression, ran on the original set of 24 features.}
+\includegraphics[width=5in]{figures/penLLmisses.pdf}
+\caption{Penalized logistic regression, ran on the original set of 24(+1) features.}
 \label{fig:penLLmisses}
 \end{figure}
 
-
-\begin{figure}[!t]
+\begin{figure}[h]
 \center
-\includegraphics[width=6in]{figures/polyLogLoss.pdf}
-\caption{\todo{Polygon.}}
+\includegraphics[width=5in]{figures/polyLogLoss.pdf}
+\caption{Panalized logistic regression, ran on the expanded feature set: a second degree polynomial (625 features).}
 \label{fig:polyErrors}
 \end{figure}
 
-
-
 \section{Summary}
-
-\subsubsection*{Acknowledgments}
-
-\subsubsection*{References}
 
 \end{document}
