@@ -20,7 +20,7 @@ y_train = (y_train + 1)/2; % !!! remember to invert that for predictions
 
 %% Multiple-cut logistic regression.
 if (strcmp(stage, 'logReg'))
-    seeds = [1:10 42 43 7500 100500];
+    seeds = 1:15;
     for s = 1:length(seeds)
         seed = seeds(s);
         [XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.9, seed);
@@ -120,8 +120,8 @@ end;
 %% Polynomial
 if (strcmp(stage, 'polynomial'))
     mvals = [2];
-    alphas = [1e-1];
-    lvals = logspace(-3, 0, 30);
+    alphas = [1e-4];
+    lvals = logspace(-3, 0, 7);
 
     errorTeSub = zeros(K,1);
     errorTrSub = zeros(K,1);
@@ -136,11 +136,7 @@ if (strcmp(stage, 'polynomial'))
                 [yTrTe, yTrTr, pXTrTe, pXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
 
                 alpha = alphas(j);
-                if (lambda > 1)
-                    beta = penLogisticRegression(yTrTr, pXTrTr, alpha/10/lambda, lambda, 1e-5/lambda);
-                else
-                    beta = penLogisticRegression(yTrTr, pXTrTr, alpha, lambda, 1e-4);
-                end;
+                beta = penLogisticRegression(yTrTr, pXTrTr, alpha/lambda, lambda, 1e-7/lambda);
 
                 [rmseTrSub(k), zeroOneTrSub(k), logTrSub(k)] = classificationLosses(pXTrTr, beta, yTrTr);
                 [rmseTeSub(k), zeroOneTeSub(k), logTeSub(k)] = classificationLosses(pXTrTe, beta, yTrTe);
@@ -155,9 +151,9 @@ if (strcmp(stage, 'polynomial'))
     [zeroOneStar l01Star] = min(zeroOneTe(1,:));
     [logStar llogStar] = min(logTe(1,:));
 
-    [cvPenTestrmse, ~, ~] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(lrmseStar), 1e-4), yTe)
-    [~, cvPenTest01, ~] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(l01Star), 1e-4), yTe)
-    [~, ~, cvPenTestlog] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(llogStar), 1e-4), yTe)
+    [cvPolyTestrmse, ~, ~] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(lrmseStar), 1e-4), yTe)
+    [~, cvPolyTest01, ~] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(l01Star), 1e-4), yTe)
+    [~, ~, cvPolyTestlog] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(llogStar), 1e-4), yTe)
 
     %pXTe = [ones(size(XTe, 1), 1) myPoly(XTe, 2)];
     %pXTe = myPoly(tXTe, m);
@@ -166,7 +162,7 @@ if (strcmp(stage, 'polynomial'))
     hold on;
     plot(lvals, logTr, 'r');
     set(gca,'XScale', 'log');
-    title('Mispredictions for the second degreee polinom.');
+    %title('Mispredictions for the second degreee polinom.');
     hx = xlabel('Penalizer coefficient lambda');
     hy = ylabel('logLoss');
     legend('Test error', 'Training error', 'Location', 'SouthEast');
@@ -185,7 +181,7 @@ end;
 
 %% Penalized logistic regression
 if (strcmp(stage, 'penLogReg'))
-    lvals = logspace(-3, 2, 40);
+    lvals = logspace(-7, -1, 10);
 
     for l = 1:length(lvals)
         lambda = lvals(l);
@@ -193,11 +189,8 @@ if (strcmp(stage, 'penLogReg'))
         for k = 1:K
             [yTrTe, yTrTr, tXTrTe, tXTrTr] = split4crossValidation(k, idxCV, yTr, tXTr);
 
-            alpha = 1e-1;
-            if (lambda > 1)
-                alpha = alpha/lambda;
-            end;
-            beta = penLogisticRegression(yTrTr, tXTrTr, alpha, lambda, 1e-10);
+            alpha = 1e-2/sqrt(sqrt(lambda));
+            beta = penLogisticRegression(yTrTr, tXTrTr, alpha, lambda, 1e-7);
 
             [rmseTrSub(k), zeroOneTrSub(k), logTrSub(k)] = classificationLosses(tXTrTr, beta, yTrTr);
             [rmseTeSub(k), zeroOneTeSub(k), logTeSub(k)] = classificationLosses(tXTrTe, beta, yTrTe);
@@ -215,13 +208,13 @@ if (strcmp(stage, 'penLogReg'))
     [~, cvPenTest01, ~] = classificationLosses(tXTe, penLogisticRegression(yTr, tXTr, 1e-1, lvals(l01Star), 1e-10), yTe)
     [~, ~, cvPenTestlog] = classificationLosses(tXTe, penLogisticRegression(yTr, tXTr, 1e-1, lvals(llogStar), 1e-10), yTe)
 
-    plot(lvals, zeroOneTe, 'b');
+    plot(lvals, logTe, 'b');
     hold on;
-    plot(lvals, zeroOneTr, 'r');
+    plot(lvals, logTr, 'r');
     %hold on;
     %plot(lvals, zeroOneTT, 'g');
     set(gca,'XScale', 'log');
-    title('Mispredictions for penalized logistic regression.');
+    %title('Mispredictions for penalized logistic regression.');
     hx = xlabel('Penalizer coefficient lambda');
     hy = ylabel('logLoss');
     legend('Test error', 'Training error', 'Location', 'northwest');
