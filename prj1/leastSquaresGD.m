@@ -3,7 +3,7 @@
 function [ beta ] = leastSquaresGD(y, tX, alpha)
   % Set initial beta
   beta = zeros(size(tX,2), 1);
-  epsilon = 1e-6;
+  epsilon = 1e-9;
   % Check if the maximum number of iteration is reached
   maxItersReached = true;
   

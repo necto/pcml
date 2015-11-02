@@ -3,13 +3,18 @@ if (exist('reportMode', 'var') == 1)
 else
     clear all;
     close all;
-    forReport = false;
-    %Possible values: 'leastSqGD', 'leastSq', 'removal', 'dummy',
-    %'ridgeReg';
-    stage = 'ridgeReg';
+    forReport = true;
+    %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
+    % 'dummy','ridgeReg';
+    stage = 'leastSq';
 end;
 
 load('data/regression.mat');
+%% Remove outliers
+outliers = getOutliers(X_train);
+X_train = X_train(outliers==0,:);
+y_train = y_train(outliers==0);
+
 
 %% Linear regression using gradient descent
 if (strcmp(stage, 'leastSqGD'))
@@ -89,9 +94,9 @@ if (strcmp(stage, 'ridgeReg'))
   errorTe = zeros(K, 1);
   errorTr = zeros(K, 1);
   errorTT = zeros(K, 1);
-  rmseTe = zeros(size(mvals), size(lvals));
-  rmseTr = zeros(size(mvals), size(lvals));
-  rmseTT = zeros(size(mvals), size(lvals));
+  rmseTe = zeros(size(mvals,2), size(lvals,2));
+  rmseTr = zeros(size(mvals,2), size(lvals,2));
+  rmseTT = zeros(size(mvals,2), size(lvals,2));
   for j = 1:length(mvals)
     m = mvals(j);
     pXTr = myPoly(tXTr, m);
@@ -115,23 +120,116 @@ if (strcmp(stage, 'ridgeReg'))
     [rmseTrStar lrmseTrStar] = min(rmseTr(1,:));
     [rmseTTStar lrmseTTStar] = min(rmseTT(1,:));
     fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,rmseTTStar);
-    figure;
-    plot(lvals,rmseTe);
+ 
+    plot(lvals, rmseTe, 'b');
+    hold on;
+    plot(lvals, rmseTr, 'r');
+    set(gca,'XScale', 'log');
+    title('Mispredictions for the second degreee polinom.');
+    hx = xlabel('Penalizer coefficient lambda');
+    hy = ylabel('rmse');
+    legend('Test error', 'Training error', 'Location', 'SouthEast');
+    set(gca,'fontsize',20,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
+    set([hx; hy],'fontsize',18,'fontname','avantgarde','color',[.3 .3 .3]);
+    grid on;
+    
+    if (forReport)
+      disp('printing the figure');
+      set(gcf, 'PaperUnits', 'centimeters');
+      set(gcf, 'PaperPosition', [0 0 20 12]);
+      set(gcf, 'PaperSize', [20 12]);
+      print -dpdf 'report/figures/ridgeRegLoss.pdf'
+    end;
   end;
 end;
 
-%% Remove outliers
-% outliers = getOutliers(X_train);
-% X_train = X_train(outliers==0,:);
-% y_train = y_train(outliers==0);
+%% Dummy coding
+if (strcmp(stage, 'dummy'))
+    discFeatures = [2,12,14,29,48,62];
+    for i = 1:length(discFeatures)
+        dXTr = tXTr;
+        dXTe = tXTe;
+        for v = unique(XTr(:, discFeatures(i)))'
+            dXTr(:,size(dXTr, 2)+1) = (XTr(:,discFeatures(i)) == v);
+            dXTe(:,size(dXTe, 2)+1) = (XTe(:,discFeatures(i)) == v);
+        end;
+        for k = 1:K
+            [yTrTe, yTrTr, dXTrTe, dXTrTr] = split4crossValidation(k, idxCV, yTr, dXTr);
+
+            beta = leastSquares(yTrTr, dXTrTr);
+
+            rmseTrSub(k) = computeCost(yTrTr, dXTrTr, beta);
+            rmseTeSub(k) = computeCost(yTrTe, dXTrTe, beta);
+        end;
+        rmseTe(i) = sqrt(2*mean(rmseTeSub));
+        rmseTr(i) = sqrt(2*mean(rmseTrSub));
+        beta = leastSquares(yTr, dXTr);
+        rmseTT(i) = sqrt(2*computeCost(yTe, dXTe, beta));
+    end;
+    [rmseStar lrmseStar] = min(rmseTe(1,:));
+    [rmseTrStar lrmseTrStar] = min(rmseTr(1,:));
+    [rmseTTStar lrmseTTStar] = min(rmseTT(1,:));
+    fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,rmseTTStar);
+end;
 
 %% Feature removal
-c = corr(X_train,y_train);
-idx = find(abs(c)>0.04);
-X_train = X_train(:,idx);
-figure;
-plot(corr(X_train,y_train));
+if (strcmp(stage, 'removal'))
+    for i = 1:size(tXTr,2)
+        errorTeSub = zeros(K, 1);
+        errorTrSub = zeros(K, 1);
+        rXTr = tXTr(:,[1:i-1 i+1:end]);
+        for k = 1:K
+            [yTrTe, yTrTr, rXTrTe, rXTrTr] = split4crossValidation(k, idxCV, yTr, rXTr);
 
-%% Enable dummy coding for X_train columns [2,12,14,29,48,62]
-% X_train = dummyCoding(X_train, [2,12,14,29,48,61]);
+            beta = leastSquares(yTrTr, rXTrTr);
+            rmseTrSub(k) = computeCost(yTrTr, rXTrTr, beta);
+            rmseTeSub(k) = computeCost(yTrTe, rXTrTe, beta);
+        end;
+        rmseTe(i) = sqrt(2*mean(rmseTeSub));
+        rmseTr(i) = sqrt(2*mean(rmseTrSub));
+    end
+    [rmseStar irmseStar] = min(rmseTe);
 
+    nfrmseBeta = leastSquares(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]));
+    nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
+end;
+
+%% Feature removal 2
+if (strcmp(stage, 'removalcor'))
+  c = corr(XTr,yTr);
+  sortedc = sort(abs(c));
+  for i = 1:size(sortedc,1)
+    errorTeSub = zeros(K, 1);
+    errorTrSub = zeros(K, 1);
+    idx = find(abs(c)>sortedc(i));
+    rXTr = tXTr(:,idx);
+    for k = 1:K
+        [yTrTe, yTrTr, rXTrTe, rXTrTr] = split4crossValidation(k, idxCV, yTr, rXTr);
+
+        beta = leastSquares(yTrTr, rXTrTr);
+        rmseTrSub(k) = computeCost(yTrTr, rXTrTr, beta);
+        rmseTeSub(k) = computeCost(yTrTe, rXTrTe, beta);
+    end;
+    rmseTe(i) = sqrt(2*mean(rmseTeSub));
+    rmseTr(i) = sqrt(2*mean(rmseTrSub));
+  end
+  [rmseStar irmseStar] = min(rmseTe);
+
+  nfrmseBeta = leastSquares(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]));
+  nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
+end;
+
+%% Predictions:
+if (forReport && strcmp(stage, 'leastSq'))
+    [XTrn, XTrn_mean, XTrn_std] = normalize(X_train);
+    Xtst = adjust(X_test, XTrn_mean, XTrn_std);
+    tXTrn = [ones(size(XTrn, 1), 1) XTrn];
+    tXtst = [ones(size(Xtst, 1), 1) Xtst];
+
+    beta = leastSquares(y_train, tXTrn);
+    predictions = tXtst*beta;
+    csvwrite('predictions_regression.csv', predictions);
+    errFile = fopen('test_errors_regression.csv', 'wt');
+    fprintf(errFile, 'rmse,%d', lSqTestRMSE);
+    fclose(errFile);
+end;
