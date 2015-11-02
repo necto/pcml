@@ -77,7 +77,7 @@ By looking at the histograms of the input variables, we notice that there are so
 By removing them the RMSE decrease slightly.
 For example with leastSquares it decreases from 1378.8 to 1370.4.
 
-Secondly we notice that the distributions of the input data are not centered, so we chose to normalize them.
+Secondly, we notice that the distributions of the input data are not centered, so we chose to normalize them.
 
 Figure \ref{fig:scatter} show a scatter plot of one input variable vs the output and figure \ref{fig:histY} shows the histogram of the output.
 We can notice that the data are separated into 3 groups.
@@ -98,9 +98,12 @@ The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we
 \end{figure}
 
 \section{Regression}
-To  estimate the RMSE of our model with the data in hand, we split them into training and validation sets (90\% as training data and 10\% as validation) and pretend validation set is the future data.
+The implementation of least squares, least squares using gradient descent and ridge regression is mandatory for this project.
 
-We started by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
+We start by applying those three methods to the data and visualize the results  as well as compute tests errors using cross validation.
+To  estimate the RMSE of our model with the data in hand, we split them into training and validation sets and pretend validation set is the future data.
+
+The best errors for each method are shown in Table \ref{tab:regression-errors}.
 
 The rest of this section describes the details of each of these methods.
 
@@ -146,12 +149,18 @@ The rest of this section describes the details of each of these methods.
 \end{table}
 
 
-
 \subsection{Least Squares}
 As explained in the ``Data visualization and cleaning" section, the matrix $\boldmath{X\_train}$ is ill-conditioned.
-This is problematic with least squares because it can lead 
+This is problematic with least squares because it can lead to wrong results.
+
+In Table \ref{tab:regression-errors} we see that both Least Squares and Least Squares with gradient descent have the best RMSE even though the matrix is rank deficient.
 
 \subsection{Ridge Regression}
+
+For our dataset, Ridge regression performance is worse than Least Squares.
+Figure \ref{fig:ridgeRegError} shows the results obtained with ridge regression for a polynomial of degree 2 and a training set of 90\% of the data, the rest being the testing set. $\lambda$ varies from $10$ to $10^{5}$ with a total of 20 points in between. 
+There is only 20 points because the computation is expensive. Indeed with a degree 2, we have 4356 features and 287496 for degree 3.
+
 \begin{figure}[!t]
 	\center
 	\includegraphics[width=0.8\textwidth]{figures/ridgeRegLoss.pdf}
@@ -168,12 +177,12 @@ Unfortunately, feature removal does not improve our model. It is actually the op
 
 Secondly, we tried dummy coding of the categorical variables.
 As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
-
-
+We apply dummy coding to each of these variables and compute the new RMSE.
+Table \ref{tab:regression-dummy} shows that again there is no improvements.
 
 \section{Classification}
 
-Before getting into the analysis, we first shuffle the data by pseudo-rundom permutation to get rid of inherent ordering, that might bias the model. We also average the results over a range of rundom number generator seeds. We use In order to evaluate our final model later we cut off 10\% of the training data (150 points) to simulate the unseen future input.
+Before getting into the analysis, we first shuffle the data by pseudo-random permutation to get rid of inherent ordering, that might bias the model. We also average the results over a range of random number generator seeds. We use In order to evaluate our final model later we cut off 10\% of the training data (150 points) to simulate the unseen future input.
 
 We started with the classical logistic regression, and tried to improve the obtained result using penalized logistic regression and various feature transformations. The best errors for each method are shown in the Table~\ref{tab:classification-errors}. The rest of this section describes the details of each of them. The baseline -- trivial constant majority-based prediction is also shown for a reference.
 \begin{table}[h]
@@ -194,7 +203,7 @@ We started with the classical logistic regression, and tried to improve the obta
 \end{table}
 
 \subsection{Penalized Logistic Regression}
-As a natural next step after the logistic regression, we ran a penalized logistic regression, to see how much of the test error can be attributed to the variance in the data. The plot of logLoss is in the Fig.~\ref{fig:penLLmisses}. Other metrics evince a steady monotonical growth and have optimum at $\lambda = 0$, which tells us about high model bias and an insignificant variance in the data. Only the interesting range of $\lambda$ is shown.
+As a natural next step after the logistic regression, we ran a penalized logistic regression, to see how much of the test error can be attributed to the variance in the data. The plot of logLoss is in the Fig.~\ref{fig:penLLmisses}. Other metrics evince a steady monotonic growth and have optimum at $\lambda = 0$, which tells us about high model bias and an insignificant variance in the data. Only the interesting range of $\lambda$ is shown.
 
 \begin{figure}[h]
 \center
@@ -235,6 +244,9 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 
 \section{Summary}
 
-In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and \todo{which method?} gives the best results on the regression data. The table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12\% ($\pm$ 3\%) off on the test dataset.
+In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and least squares gives the best results on the regression data. The table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12\% ($\pm$ 3\%) off on the test dataset.
+
+The table \ref{tab:regression-errors} shows that least squares offer the lowest RMSE. But as the matrix is ill-conditioned we have to be careful because it can gives wrong results. 
+We expect the RMSE of our predictions to be 1370.14.
 
 \end{document}

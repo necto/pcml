@@ -6,7 +6,7 @@ else
     forReport = true;
     %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
     % 'dummy','ridgeReg';
-    stage = 'a';
+    stage = 'leastSq';
 end;
 removingOutliers = false;
 enableFullDummyCoding = false;
