@@ -58,7 +58,7 @@ istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_
 	cp predictions_classification.csv submission/
 	cp test_errors_classification.csv submission/
 	cp report/report.pdf submission/
-	zip -r istanbul.zip submission
+	zip -r -j istanbul.zip submission
 
 package: istanbul.zip
 
