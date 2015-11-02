@@ -225,7 +225,7 @@ Having failed to reduct the feature set, we started expanding it, as our logisti
   \end{center}
 \end{table}
 
-The last transformation tried is {\bf polynomial}. Monomial basis can theoretically approximate any function. We generate a full polynom, which means 625 features for second degree and 15625 -- for the third, which is substentially greater than the number of training data points, so due to the curse of dimensionality, the regression is unable to fit a satisfactory model. Therefore we tested only the second degree. We used cross validation with penalized logistic regression to supress the high variance of 625 features. In the Fig.~\ref{fig:polyErrors} you can see the plot of logLoss function for the polynomial of the second degree. The other two metrics for the given random seed again do not have a bell form.
+The last transformation tried is {\bf polynomial}. Monomial basis can theoretically approximate any function. We generate a full polynomial, which means 625 features for second degree and 15625 -- for the third, which is substentially greater than the number of training data points, so due to the curse of dimensionality, the regression is unable to fit a satisfactory model. Therefore we tested only the second degree. We used cross validation with penalized logistic regression to supress the high variance of 625 features. In the Fig.~\ref{fig:polyErrors} you can see the plot of logLoss function for the polynomial of the second degree. The other two metrics for the given random seed again do not have a bell form.
 
 \begin{figure}[h]
 \center
