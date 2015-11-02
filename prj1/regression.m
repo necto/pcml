@@ -53,6 +53,7 @@ end;
 if (strcmp(stage, 'leastSq'))
   disp('Least squares using normal equations');
   seeds = [1:10 42 43 7500 100500];
+
   errorTe = zeros(length(seeds), 1);
   errorTr = zeros(length(seeds), 1);
   for s = 1:length(seeds)
@@ -199,8 +200,7 @@ if (strcmp(stage, 'removal'))
     end
     [rmseStar irmseStar] = min(rmseTe);
     [rmseTrStar irmseTrStar] = min(rmseTr);
-
-
+    
     nfrmseBeta = leastSquares(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]));
     nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
     fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,nfTestRMSE);
@@ -232,21 +232,6 @@ if (strcmp(stage, 'removalcor'))
   nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
   fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,nfTestRMSE);
 
-end;
-
-%% Predictions:
-if (forReport && strcmp(stage, 'leastSq'))
-    [XTrn, XTrn_mean, XTrn_std] = normalize(X_train);
-    Xtst = adjust(X_test, XTrn_mean, XTrn_std);
-    tXTrn = [ones(size(XTrn, 1), 1) XTrn];
-    tXtst = [ones(size(Xtst, 1), 1) Xtst];
-
-    beta = leastSquares(y_train, tXTrn);
-    predictions = tXtst*beta;
-    csvwrite('predictions_regression.csv', predictions);
-    errFile = fopen('test_errors_regression.csv', 'wt');
-    fprintf(errFile, 'rmse,%d', lSqTestRMSE);
-    fclose(errFile);
 end;
 
 %% Figures for report
@@ -312,4 +297,19 @@ if(forReport)
   set(gcf, 'PaperPosition', [0 0 20 12]);
   set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/X43vsY.pdf'
+end;
+
+%% Predictions:
+if (forReport && strcmp(stage, 'leastSq'))
+    [XTrn, XTrn_mean, XTrn_std] = normalize(X_train);
+    Xtst = adjust(X_test, XTrn_mean, XTrn_std);
+    tXTrn = [ones(size(XTrn, 1), 1) XTrn];
+    tXtst = [ones(size(Xtst, 1), 1) Xtst];
+
+    beta = leastSquares(y_train, tXTrn);
+    predictions = tXtst*beta;
+    csvwrite('predictions_regression_1.csv', predictions);
+    errFile = fopen('test_errors_regression_1.csv', 'wt');
+    fprintf(errFile, 'rmse,%d', lSqTestRMSE);
+    fclose(errFile);
 end;

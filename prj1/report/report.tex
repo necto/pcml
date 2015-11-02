@@ -215,7 +215,7 @@ As a natural next step after the logistic regression, we ran a penalized logisti
 \subsection{Feature transformations}
 Look at the ``Data visualization and cleaning'' for the initial data preparation.
 
-First thing we tried is {\bf removal} of every single feature, in oreder to decrease the dimensionality of the problem, to speed up future analyses. To find an irrelevant feature, we, using cross validation, sequentially fitted logistic regression on the training data set with the feature \# i removed, and tested the resulting model. Unfortunately, it turns out, that every of the 24 features is relevant, and removing any of them worsen the prediction, as you can see in the Table~\ref{tab:classification-errors}.
+First thing we tried is {\bf removal} of every single feature, in order to decrease the dimensionality of the problem, to speed up future analyses. To find an irrelevant feature, we, using cross validation, sequentially fitted logistic regression on the training data set with the feature \# i removed, and tested the resulting model. Unfortunately, it turns out, that each of the 24 features is relevant, and removing any of them worsen the prediction, as you can see in the Table~\ref{tab:classification-errors}.
 
 Having failed to reduct the feature set, we started expanding it, as our logistic regression has high bias. One of the promising methods is {\bf dummy-encoding}. There are four features, that have a finite and small discrete range. The results of expanding each of these features are shown in the Table~\ref{tab:classification-dummy}. As you can see from the table, no luck this time as well. Although, feature \#9 dummy-encoding promises a slightly (0.1\%) better prediction in terms of 0-1 loss, it is worse in other metrics, comparing to the original logistic regression.
 \begin{table}[h]
@@ -233,12 +233,12 @@ Having failed to reduct the feature set, we started expanding it, as our logisti
   \end{center}
 \end{table}
 
-The last transformation tried is {\bf polynomial}. Monomial basis can theoretically approximate any function. We generate a full polynomial, which means 625 features for second degree and 15625 -- for the third, which is substentially greater than the number of training data points, so due to the curse of dimensionality, the regression is unable to fit a satisfactory model. Therefore we tested only the second degree. We used cross validation with penalized logistic regression to supress the high variance of 625 features. In the Fig.~\ref{fig:polyErrors} you can see the plot of logLoss function for the polynomial of the second degree. The other two metrics for the given random seed again do not have a bell form.
+The last transformation tried is {\bf polynomial}. Monomial basis can theoretically approximate any function. We generate a full polynomial, which means 625 features for second degree and 15625 -- for the third, which is substantially greater than the number of training data points, so due to the curse of dimensionality, the regression is unable to fit a satisfactory model. Therefore we tested only the second degree. We used cross validation with penalized logistic regression to suppress the high variance of 625 features. In the Fig.~\ref{fig:polyErrors} you can see the plot of logLoss function for the polynomial of the second degree. The other two metrics for the given random seed again do not have a bell form.
 
 \begin{figure}[h]
 \center
 \includegraphics[width=5in]{figures/polyLogLoss.pdf}
-\caption{Panalized logistic regression, ran on the expanded feature set: a second degree polynomial (625 features).}
+\caption{Penalized logistic regression, ran on the expanded feature set: a second degree polynomial (625 features).}
 \label{fig:polyErrors}
 \end{figure}
 
@@ -247,6 +247,6 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and least squares gives the best results on the regression data. The table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12\% ($\pm$ 3\%) off on the test dataset.
 
 The table \ref{tab:regression-errors} shows that least squares offer the lowest RMSE. But as the matrix is ill-conditioned we have to be careful because it can gives wrong results. 
-We expect the RMSE of our predictions to be 1370.14.
+We expect the RMSE of our predictions to be 1370.14 ($\pm$ 9\%).
 
 \end{document}
