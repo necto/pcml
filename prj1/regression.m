@@ -1,17 +1,15 @@
 if (exist('reportMode', 'var') == 1)
     forReport = true;
-    removingOutliers = true;
-    enableFullDummyCoding = false;
 else
     clear all;
     close all;
     forReport = false;
-    removingOutliers = true;
-    enableFullDummyCoding = false;
     %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
     % 'dummy','ridgeReg';
-    stage = 'leastSq';
 end;
+removingOutliers = true;
+enableFullDummyCoding = false;
+stage = 'leastSq';
 
 load('data/regression.mat');
 %% Remove outliers
