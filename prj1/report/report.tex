@@ -48,9 +48,9 @@ EPFL \\
 \maketitle
 
 \begin{abstract}
-In this report we describe our results for the first project of the PCML class.
+In this report we describe our results for the first project of the 2015 PCML class.
 We start by doing some basic exploratory data analysis on our dataset, then we implement regression and classification methods to analyze and predict data.
-Finally we experimented with feature engineering and processing with the goal of improving the accuracy of our models.
+Finally we experiment with feature engineering and processing with the goal of improving the accuracy of our models.
 \end{abstract}
 
 \section{Data Description}
@@ -104,7 +104,11 @@ To  estimate the rmse of our model with the data in hand, we split them into tra
 We stared by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
 
 The rest of this section describes the details of each of these methods.
-\begin{table}[h]
+
+\begin{table}[!htb]
+	\begin{minipage}{.5\linewidth}
+		\centering
+
 	\begin{center}
 		\begin{tabular}{l|c}
 			Method & RMSE  \\
@@ -119,7 +123,30 @@ The rest of this section describes the details of each of these methods.
 		\caption{The best errors for the regression methods tried.}
 		\label{tab:regression-errors}
 	\end{center}
+	
+	\end{minipage}
+	\begin{minipage}{.5\linewidth}
+		\centering
+		
+	\begin{center}
+		\begin{tabular}{l|c}
+			Feature\# & RMSE  \\
+			\hline
+			2 &  1410.2 \\
+			12 & 1410.1 \\
+			14 &  1409.4 \\
+			29 &  1410.6 \\
+			48 &  1410.2 \\
+			62 &  1409.8 \\
+		\end{tabular}
+		\caption{RMSE for dummy coding.}
+		\label{tab:regression-dummy}
+	\end{center}
+	
+	\end{minipage} 
 \end{table}
+
+
 
 \subsection{Least Squares}
 As explained in the ``Data visualization and cleaning" section, the matrix X\_train is ill-conditioned.
@@ -143,22 +170,7 @@ Unfortunately, feature removal does not improve our model. It is actually the op
 Secondly we tried dummy coding of the categorical variables.
 As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
 
-\begin{table}[h]
-	\begin{center}
-		\begin{tabular}{l|c}
-			Feature\# & RMSE  \\
-			\hline
-			2 &  1410.2 \\
-			12 & 1410.1 \\
-			14 &  1409.4 \\
-			29 &  1410.6 \\
-			48 &  1410.2 \\
-			62 &  1409.8 \\
-		\end{tabular}
-		\caption{RMSE for dummy coding.}
-		\label{tab:regression-dummy}
-	\end{center}
-\end{table}
+
 
 \section{Classification}
 
