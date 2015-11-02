@@ -33,7 +33,7 @@ predictions_regression.csv test_errors_regression.csv: *.m
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
 
 report/report.pdf: report/report.tex report/figures/penLLmisses.pdf report/figures/polyLogLoss.pdf report/figures/histY.pdf report/figures/CorrelationXY.pdf report/figures/X58vsY.pdf report/figures/X43vsY.pdf 
-	cd report && pdflatex report.tex
+	cd report && pdflatex report.tex && pdflatex report.tex
 
 istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_classification.csv test_errors_classification.csv report/report.pdf *.m
 	mkdir -p submission
