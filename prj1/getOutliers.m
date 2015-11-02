@@ -1,3 +1,5 @@
+% We see some outliers on the histogram of the inputs.
+% This function return the index of all these outliers
 function [ outliers ] = getOutliers( X_train )
   outliers = zeros(size(X_train,1),1);
   outliers = outliers | (X_train(:,1)<1.5 | (X_train(:,1)>8));
