@@ -94,14 +94,14 @@ The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we
 \begin{figure}[!t]
 	\centering
 	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=0.4\textwidth]{figures/X58vsY.pdf}}
-	\subfigure[Histogram of y\_train]{\label{fig:histY}\includegraphics[width=0.4\textwidth]{figures/histY.pdf}}
+	\subfigure[Histogram of $\boldmath{y\_train}$]{\label{fig:histY}\includegraphics[width=0.4\textwidth]{figures/histY.pdf}}
 	\caption{Data analysis}
 \end{figure}
 
 \section{Regression}
 To  estimate the rmse of our model with the data in hand, we split them into training and validation sets (90\% as training data and 10\% as validation) and pretend validation set is the future data.
 
-We stared by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
+We started by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
 
 The rest of this section describes the details of each of these methods.
 
@@ -149,7 +149,7 @@ The rest of this section describes the details of each of these methods.
 
 
 \subsection{Least Squares}
-As explained in the ``Data visualization and cleaning" section, the matrix X\_train is ill-conditioned.
+As explained in the ``Data visualization and cleaning" section, the matrix $\boldmath{X\_train}$ is ill-conditioned.
 This is problematic with least squares because it can lead 
 
 \subsection{Ridge Regression}
@@ -167,7 +167,7 @@ In order to improve the rmse of our model, we tried several feature transformati
 Firstly, we try to decrease the dimensionality of the problem by sequentially removing each feature and apply cross validation to estimate the rmse with each feature removed.
 Unfortunately, feature removal does not improve our model. It is actually the opposite as the rmse increase slightly.
 
-Secondly we tried dummy coding of the categorical variables.
+Secondly, we tried dummy coding of the categorical variables.
 As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
 
 
