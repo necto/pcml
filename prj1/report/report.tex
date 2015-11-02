@@ -93,14 +93,14 @@ The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we
 \begin{figure}[!t]
 	\centering
 	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=0.55\textwidth]{figures/X58vsY.pdf}}
-	\subfigure[Histogram of y\_train]{\label{fig:histY}\includegraphics[width=0.4\textwidth]{figures/histY.pdf}}
+	\subfigure[Histogram of $\boldmath{y\_train}$]{\label{fig:histY}\includegraphics[width=0.4\textwidth]{figures/histY.pdf}}
 	\caption{Data analysis}
 \end{figure}
 
 \section{Regression}
 To  estimate the RMSE of our model with the data in hand, we split them into training and validation sets (90\% as training data and 10\% as validation) and pretend validation set is the future data.
 
-We stared by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
+We started by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
 
 The rest of this section describes the details of each of these methods.
 
@@ -148,8 +148,8 @@ The rest of this section describes the details of each of these methods.
 
 
 \subsection{Least Squares}
-As explained in the ``Data visualization and cleaning" section, the matrix X\_train is ill-conditioned.
-This is problematic with least squares because it is possible that it will not work well.
+As explained in the ``Data visualization and cleaning" section, the matrix $\boldmath{X\_train}$ is ill-conditioned.
+This is problematic with least squares because it can lead 
 
 \subsection{Ridge Regression}
 \begin{figure}[!t]
@@ -166,7 +166,7 @@ In order to improve the RMSE of our model, we tried several feature transformati
 Firstly, we try to decrease the dimensionality of the problem by sequentially removing each feature and apply cross validation to estimate the RMSE with each feature removed.
 Unfortunately, feature removal does not improve our model. It is actually the opposite as the RMSE increase slightly.
 
-Secondly we tried dummy coding of the categorical variables.
+Secondly, we tried dummy coding of the categorical variables.
 As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
 
 
@@ -196,6 +196,13 @@ We started with the classical logistic regression, and tried to improve the obta
 \subsection{Penalized Logistic Regression}
 As a natural next step after the logistic regression, we ran a penalized logistic regression, to see how much of the test error can be attributed to the variance in the data. The plot of logLoss is in the Fig.~\ref{fig:penLLmisses}. Other metrics evince a steady monotonical growth and have optimum at $\lambda = 0$, which tells us about high model bias and an insignificant variance in the data. Only the interesting range of $\lambda$ is shown.
 
+\begin{figure}[h]
+\center
+\includegraphics[width=5in]{figures/penLLmisses.pdf}
+\caption{Penalized logistic regression, ran on the original set of 24(+1) features.}
+\label{fig:penLLmisses}
+\end{figure}
+
 \subsection{Feature transformations}
 Look at the ``Data visualization and cleaning'' for the initial data preparation.
 
@@ -217,14 +224,7 @@ Having failed to reduct the feature set, we started expanding it, as our logisti
   \end{center}
 \end{table}
 
-The last transformation tried is {\bf polynomial}. Monomial basis can theoretically approximate any function. We generate a full polynom, which means 625 features for second degree and 15625 -- for the third, which is substentially greater than the number of training data points, so due to the curse of dimensionality, the regression is unable to fit a satisfactory model. Therefore we tested only the second degree. We used cross validation with penalized logistic regression to supress the high variance of 625 features. In the Fig.~\ref{fig:polyErrors} you can see the plot of logLoss function for the polynomial of the second degree. The other two metrics for the given random seed again do not have a bell form.
-
-\begin{figure}[h]
-\center
-\includegraphics[width=5in]{figures/penLLmisses.pdf}
-\caption{Penalized logistic regression, ran on the original set of 24(+1) features.}
-\label{fig:penLLmisses}
-\end{figure}
+The last transformation tried is {\bf polynomial}. Monomial basis can theoretically approximate any function. We generate a full polynomial, which means 625 features for second degree and 15625 -- for the third, which is substentially greater than the number of training data points, so due to the curse of dimensionality, the regression is unable to fit a satisfactory model. Therefore we tested only the second degree. We used cross validation with penalized logistic regression to supress the high variance of 625 features. In the Fig.~\ref{fig:polyErrors} you can see the plot of logLoss function for the polynomial of the second degree. The other two metrics for the given random seed again do not have a bell form.
 
 \begin{figure}[h]
 \center
@@ -234,5 +234,7 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 \end{figure}
 
 \section{Summary}
+
+In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and \todo{which method?} gives the best results on the regression data. The table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12\% ($\pm$ 3\%) off on the test dataset.
 
 \end{document}
