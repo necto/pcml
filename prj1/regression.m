@@ -6,10 +6,10 @@ else
     forReport = false;
     %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
     % 'dummy','ridgeReg';
+    stage = 'leastSq';
 end;
 removingOutliers = true;
 enableFullDummyCoding = false;
-stage = 'leastSq';
 
 load('data/regression.mat');
 %% Remove outliers

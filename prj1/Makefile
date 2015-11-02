@@ -12,19 +12,19 @@ report/figures/polyLogLoss.pdf: *.m
 
 report/figures/histY.pdf: *.m
 	mkdir -p report/figures
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;regression;quit"
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
 
 report/figures/CorrelationXY.pdf: *.m
 	mkdir -p report/figures
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;regression;quit"
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
 
 report/figures/X58vsY.pdf: *.m
 	mkdir -p report/figures
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;regression;quit"
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
 
 report/figures/X43vsY.pdf: *.m
 	mkdir -p report/figures
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;regression;quit"
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
 
 report/figures/ridgeRegLoss.pdf: *.m
 	mkdir -p report/figures
