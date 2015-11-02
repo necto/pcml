@@ -3,12 +3,12 @@ if (exist('reportMode', 'var') == 1)
 else
     clear all;
     close all;
-    forReport = false;
+    forReport = true;
     %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
     % 'dummy','ridgeReg';
-    stage = 'leastSq';
+    stage = 'a';
 end;
-removingOutliers = true;
+removingOutliers = false;
 enableFullDummyCoding = false;
 
 load('data/regression.mat');
@@ -136,7 +136,7 @@ if (strcmp(stage, 'ridgeReg'))
     set(gca,'XScale', 'log');
     title('Error for the second degree polynom.');
     hx = xlabel('Penalizer coefficient lambda');
-    hy = ylabel('rmse');
+    hy = ylabel('RMSE');
     legend('Test error', 'Training error', 'Location', 'SouthEast');
     set(gca,'fontsize',20,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
     set([hx; hy],'fontsize',18,'fontname','avantgarde','color',[.3 .3 .3]);
@@ -282,18 +282,18 @@ if(forReport)
   set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/CorrelationXY.pdf'
   %% 3 clouds
-  id1 = 58;
-  id2 = 43;
-  tXTr1 = tXTr(yTr<=5500,:);
+  id1 = 57;
+  id2 = 42;
+  XTr1 = XTr(yTr<=5500,:);
   yTr1 = yTr(yTr<=5500,:);
-  tXTr2 = tXTr(yTr>5500 & yTr<=10000 & tXTr(:,id1)>0.25 & tXTr(:,id2)<6.4,:);
-  yTr2 = yTr(yTr>5500 & yTr<=10000 & tXTr(:,id1)>0.25 & tXTr(:,id2)<6.4,:);
-  tXTr3 = tXTr(yTr>=10000,:);
+  XTr2 = XTr(yTr>5500 & yTr<=10000 & XTr(:,id1)>0.25 & XTr(:,id2)<6.4,:);
+  yTr2 = yTr(yTr>5500 & yTr<=10000 & XTr(:,id1)>0.25 & XTr(:,id2)<6.4,:);
+  XTr3 = XTr(yTr>=10000,:);
   yTr3 = yTr(yTr>=10000,:);
   figure;
-  plot(tXTr1(:,id2),yTr1,'o',tXTr2(:,id2),yTr2,'o',tXTr3(:,id2),yTr3,'o');
-  title('Scatter plot of tX\_train vs y\_train');
-  hx = xlabel('tX\_train (column 58)');
+  plot(XTr1(:,id2),yTr1,'o',XTr2(:,id2),yTr2,'o',XTr3(:,id2),yTr3,'o');
+  title('Scatter plot of X\_train vs y\_train');
+  hx = xlabel('X\_train (column 57)');
   hy = ylabel('y\_train');
   set(gca,'fontsize',13,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
   set([hx; hy],'fontsize',13,'fontname','avantgarde','color',[.3 .3 .3]);
@@ -302,9 +302,9 @@ if(forReport)
   set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/X58vsY.pdf'
   figure;
-  plot(tXTr1(:,id1),yTr1,'o',tXTr2(:,id1),yTr2,'o',tXTr3(:,id1),yTr3,'o');
-  title('Scatter plot of tX\_train vs y\_train');
-  hx = xlabel('tX\_train (column 43)');
+  plot(XTr1(:,id1),yTr1,'o',XTr2(:,id1),yTr2,'o',XTr3(:,id1),yTr3,'o');
+  title('Scatter plot of X\_train vs y\_train');
+  hx = xlabel('X\_train (column 42)');
   hy = ylabel('y\_train');
   set(gca,'fontsize',13,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
   set([hx; hy],'fontsize',13,'fontname','avantgarde','color',[.3 .3 .3]);

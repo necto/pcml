@@ -18,7 +18,6 @@
 \usepackage{placeins}
 \usepackage{geometry}
 
-
 \title{Project-I by Group Istanbul}
 
 \author{
@@ -75,31 +74,31 @@ The first step is to perform exploratory data analysis on the regression and cla
 
 \paragraph{Regression} 
 By looking at the histograms of the input variables, we notice that there are some outliers (41 to be exact). 
-By removing them the rmse decrease slightly.
+By removing them the RMSE decrease slightly.
 For example with leastSquares it decreases from 1378.8 to 1370.4.
 
 Secondly we notice that the distributions of the input data are not centered, so we chose to normalize them.
 
-Another interesting observation is the distribution of the output $\boldmath{y\_train}$ that is shown on figure \ref{fig:histY}.
-We clearly see that the data are separated into 3 groups.
+Figure \ref{fig:scatter} show a scatter plot of one input variable vs the output and figure \ref{fig:histY} shows the histogram of the output.
+We can notice that the data are separated into 3 groups.
 
-We also look into the correlation between input variables and the output. We see that out of the 66 input variables, two have a high correlation with the output.
+We also look into the correlation between input variables and the output. We see that out of the 66 input variables, two have a high correlation with the output. There is variable number 42 and 57 (see figure \ref{fig:scatter}) which have respectively a correlation of 0.6216 and 0.8163.
 
 The input matrix $\boldmath{X}$ is rank deficient with a rank of 55 instead of 66. This can lead to numerical issues when using methods such as least squares.
-We can fight ill-conditioning with ridge regression. The method is refer to as \textit{lifting the eigenvalues}.
+We can fight ill-conditioning with ridge regression. 
 
 \paragraph{Classification}
 The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we apply a simple transformation: ${(y + 1)\over 2} \in \{0, 1\}$. Another observation is that the standard deviation of different dimensions varies significantly: from 0.5 upto 874, so we normalize the input data, to get rid of the scale bias. Finally we add a constant feature $X_0 \equiv 1$.
 
 \begin{figure}[!t]
 	\centering
-	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=0.4\textwidth]{figures/X58vsY.pdf}}
+	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=0.55\textwidth]{figures/X58vsY.pdf}}
 	\subfigure[Histogram of y\_train]{\label{fig:histY}\includegraphics[width=0.4\textwidth]{figures/histY.pdf}}
 	\caption{Data analysis}
 \end{figure}
 
 \section{Regression}
-To  estimate the rmse of our model with the data in hand, we split them into training and validation sets (90\% as training data and 10\% as validation) and pretend validation set is the future data.
+To  estimate the RMSE of our model with the data in hand, we split them into training and validation sets (90\% as training data and 10\% as validation) and pretend validation set is the future data.
 
 We stared by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
 
@@ -150,22 +149,22 @@ The rest of this section describes the details of each of these methods.
 
 \subsection{Least Squares}
 As explained in the ``Data visualization and cleaning" section, the matrix X\_train is ill-conditioned.
-This is problematic with least squares because it can lead 
+This is problematic with least squares because it is possible that it will not work well.
 
 \subsection{Ridge Regression}
 \begin{figure}[!t]
 	\center
-	\includegraphics[width=6in]{figures/ridgeRegLoss.pdf}
-	\caption{\todo{Polygon.}}
+	\includegraphics[width=0.8\textwidth]{figures/ridgeRegLoss.pdf}
+	\caption{Plot of the test and training error for ridge regression}
 	\label{fig:ridgeRegError}
 \end{figure}
 
 
 \subsection{Feature transformations}
-In order to improve the rmse of our model, we tried several feature transformations.
+In order to improve the RMSE of our model, we tried several feature transformations.
 
-Firstly, we try to decrease the dimensionality of the problem by sequentially removing each feature and apply cross validation to estimate the rmse with each feature removed.
-Unfortunately, feature removal does not improve our model. It is actually the opposite as the rmse increase slightly.
+Firstly, we try to decrease the dimensionality of the problem by sequentially removing each feature and apply cross validation to estimate the RMSE with each feature removed.
+Unfortunately, feature removal does not improve our model. It is actually the opposite as the RMSE increase slightly.
 
 Secondly we tried dummy coding of the categorical variables.
 As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
