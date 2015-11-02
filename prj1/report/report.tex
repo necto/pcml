@@ -197,6 +197,13 @@ We started with the classical logistic regression, and tried to improve the obta
 \subsection{Penalized Logistic Regression}
 As a natural next step after the logistic regression, we ran a penalized logistic regression, to see how much of the test error can be attributed to the variance in the data. The plot of logLoss is in the Fig.~\ref{fig:penLLmisses}. Other metrics evince a steady monotonical growth and have optimum at $\lambda = 0$, which tells us about high model bias and an insignificant variance in the data. Only the interesting range of $\lambda$ is shown.
 
+\begin{figure}[h]
+\center
+\includegraphics[width=5in]{figures/penLLmisses.pdf}
+\caption{Penalized logistic regression, ran on the original set of 24(+1) features.}
+\label{fig:penLLmisses}
+\end{figure}
+
 \subsection{Feature transformations}
 Look at the ``Data visualization and cleaning'' for the initial data preparation.
 
@@ -222,18 +229,13 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 
 \begin{figure}[h]
 \center
-\includegraphics[width=5in]{figures/penLLmisses.pdf}
-\caption{Penalized logistic regression, ran on the original set of 24(+1) features.}
-\label{fig:penLLmisses}
-\end{figure}
-
-\begin{figure}[h]
-\center
 \includegraphics[width=5in]{figures/polyLogLoss.pdf}
 \caption{Panalized logistic regression, ran on the expanded feature set: a second degree polynomial (625 features).}
 \label{fig:polyErrors}
 \end{figure}
 
 \section{Summary}
+
+In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and \todo{which method?} gives the best results on the regression data. The table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12\% ($\pm$ 3\%) off on the test dataset.
 
 \end{document}
