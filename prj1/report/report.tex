@@ -217,7 +217,7 @@ Look at the ``Data visualization and cleaning'' for the initial data preparation
 
 First thing we tried is {\bf removal} of every single feature, in order to decrease the dimensionality of the problem, to speed up future analyses. To find an irrelevant feature, we, using cross validation, sequentially fitted logistic regression on the training data set with the feature \# i removed, and tested the resulting model. Unfortunately, it turns out, that each of the 24 features is relevant, and removing any of them worsen the prediction, as you can see in the Table~\ref{tab:classification-errors}.
 
-Having failed to reduct the feature set, we started expanding it, as our logistic regression has high bias. One of the promising methods is {\bf dummy-encoding}. There are four features, that have a finite and small discrete range. The results of expanding each of these features are shown in the Table~\ref{tab:classification-dummy}. As you can see from the table, no luck this time as well. Although, feature \#9 dummy-encoding promises a slightly (0.1\%) better prediction in terms of 0-1 loss, it is worse in other metrics, comparing to the original logistic regression.
+Having failed to reduce the feature set, we started expanding it, as our logistic regression has high bias. One of the promising methods is {\bf dummy-encoding}. There are four features, that have a finite and small discrete range. The results of expanding each of these features are shown in the Table~\ref{tab:classification-dummy}. As you can see from the table, no luck this time as well. Although, feature \#9 dummy-encoding promises a slightly (0.1\%) better prediction in terms of 0-1 loss, it is worse in other metrics, comparing to the original logistic regression.
 \begin{table}[h]
   \begin{center}
     \begin{tabular}{l|ccc}
@@ -244,7 +244,7 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 
 \section{Summary}
 
-In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and least squares gives the best results on the regression data. The table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12\% ($\pm$ 3\%) off on the test dataset.
+In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and least squares gives the best results on the regression data. The Table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12\% ($\pm$ 3\%) off on the test dataset.
 
 The table \ref{tab:regression-errors} shows that least squares offer the lowest RMSE. But as the matrix is ill-conditioned we have to be careful because it can gives wrong results. 
 We expect the RMSE of our predictions to be 1370.14 ($\pm$ 9\%).
