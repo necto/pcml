@@ -5,7 +5,7 @@ else
     forReport = false;
     %Possible values: 'logReg', 'penLogReg', 'removal', 'dummy',
     %'polynomial';
-    stage = 'polynomial';
+    stage = 'logReg';
 end;
 
 load('data/classification.mat');
@@ -36,9 +36,12 @@ if (strcmp(stage, 'logReg'))
         [lrTrainRMSE(s), lrTrain01(s), lrTrainLog(s)] = classificationLosses(tXTr, lrBeta, yTr);
     end;
 
+    lrTest01_std = std(lrTest01)
     lrTestRMSE = mean(lrTestRMSE)
     lrTest01 = mean(lrTest01)
     lrTestLog = mean(lrTestLog)
+    
+    
     lrTrainRMSE = mean(lrTrainRMSE)
     lrTrain01 = mean(lrTrain01)
     lrTrainLog = mean(lrTrainLog)
