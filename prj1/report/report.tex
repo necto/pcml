@@ -48,8 +48,8 @@ EPFL \\
 \maketitle
 
 \begin{abstract}
-In this report we describes our result for the first project of the PCML class.
-We start by doing some basic exploratory data analysis on our data, then we implement regression and classification methods to analyze and predict data.
+In this report we describe our results for the first project of the PCML class.
+We start by doing some basic exploratory data analysis on our dataset, then we implement regression and classification methods to analyze and predict data.
 Finally we experimented with feature engineering and processing with the goal of improving the accuracy of our models.
 \end{abstract}
 
@@ -122,7 +122,16 @@ The rest of this section describes the details of each of these methods.
 \end{table}
 
 \subsection{Least Squares}
-We have to be careful with least squares because the matrix is ill-conditioned.
+As explained in the ``Data visualization and cleaning" section, the matrix X\_train is ill-conditioned.
+This is problematic with least squares because it can lead 
+
+\subsection{Ridge Regression}
+\begin{figure}[!t]
+	\center
+	\includegraphics[width=6in]{figures/ridgeRegLoss.pdf}
+	\caption{\todo{Polygon.}}
+	\label{fig:ridgeRegError}
+\end{figure}
 
 
 \subsection{Feature transformations}
@@ -132,7 +141,7 @@ Firstly, we try to decrease the dimensionality of the problem by sequentially re
 Unfortunately, feature removal does not improve our model. It is actually the opposite as the rmse increase slightly.
 
 Secondly we tried dummy coding of the categorical variables.
-As explained in the "Data description section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
+As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
 
 \begin{table}[h]
 	\begin{center}

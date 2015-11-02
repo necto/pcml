@@ -21,6 +21,5 @@ function [ beta ] = leastSquaresGD(y, tX, alpha)
   if (maxItersReached)
       disp('Warning: Loop stopped because the max number of iteration was reached');
   end;
-  
 end
 

@@ -26,13 +26,17 @@ report/figures/X43vsY.pdf: *.m
 	mkdir -p report/figures
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;regression;quit"
 
+report/figures/ridgeRegLoss.pdf: *.m
+	mkdir -p report/figures
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='ridgeReg';regression;quit"
+
 predictions_classification.csv test_errors_classification.csv: *.m
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='logReg';classification;quit"
 
 predictions_regression.csv test_errors_regression.csv: *.m
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;stage='leastSq';regression;quit"
 
-report/report.pdf: report/report.tex report/figures/penLLmisses.pdf report/figures/polyLogLoss.pdf report/figures/histY.pdf report/figures/CorrelationXY.pdf report/figures/X58vsY.pdf report/figures/X43vsY.pdf 
+report/report.pdf: report/report.tex report/figures/penLLmisses.pdf report/figures/polyLogLoss.pdf report/figures/histY.pdf report/figures/CorrelationXY.pdf report/figures/X58vsY.pdf report/figures/X43vsY.pdf report/figures/ridgeRegLoss.pdf
 	cd report && pdflatex report.tex && pdflatex report.tex
 
 istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_classification.csv test_errors_classification.csv report/report.pdf *.m

@@ -97,7 +97,7 @@ end;
 if (strcmp(stage, 'ridgeReg'))
   disp('Ridge regression using normal equations');
   mvals = [2];
-  lvals = logspace(1,5,10);
+  lvals = logspace(1,5,15);
   
   errorTe = zeros(K, 1);
   errorTr = zeros(K, 1);
@@ -110,6 +110,7 @@ if (strcmp(stage, 'ridgeReg'))
     pXTr = myPoly(tXTr, m);
     pXTe = myPoly(tXTe, m);
     for l = 1:length(lvals)
+      disp('tic');
       lambda = lvals(l);
       for k = 1:K
         [yTrTe, yTrTr, pXTrTe, pXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
@@ -251,6 +252,7 @@ end;
 %% Figures for report
 if(forReport)
   %% Histogram of y
+  figure;
   histogram(y_train);
   title('Histogram of y\_train.');
   hx = xlabel('y\_train');
@@ -275,6 +277,9 @@ if(forReport)
 
   set(gca,'fontsize',20,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
   set([hx; hy],'fontsize',18,'fontname','avantgarde','color',[.3 .3 .3]);
+  set(gcf, 'PaperUnits', 'centimeters');
+  set(gcf, 'PaperPosition', [0 0 20 12]);
+  set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/CorrelationXY.pdf'
   %% 3 clouds
   id1 = 58;
@@ -292,6 +297,9 @@ if(forReport)
   hy = ylabel('y\_train');
   set(gca,'fontsize',13,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
   set([hx; hy],'fontsize',13,'fontname','avantgarde','color',[.3 .3 .3]);
+  set(gcf, 'PaperUnits', 'centimeters');
+  set(gcf, 'PaperPosition', [0 0 20 12]);
+  set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/X58vsY.pdf'
   figure;
   plot(tXTr1(:,id1),yTr1,'o',tXTr2(:,id1),yTr2,'o',tXTr3(:,id1),yTr3,'o');
@@ -300,5 +308,8 @@ if(forReport)
   hy = ylabel('y\_train');
   set(gca,'fontsize',13,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
   set([hx; hy],'fontsize',13,'fontname','avantgarde','color',[.3 .3 .3]);
+  set(gcf, 'PaperUnits', 'centimeters');
+  set(gcf, 'PaperPosition', [0 0 20 12]);
+  set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/X43vsY.pdf'
 end;
