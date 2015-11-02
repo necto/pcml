@@ -3,18 +3,26 @@ if (exist('reportMode', 'var') == 1)
 else
     clear all;
     close all;
-    forReport = true;
+    forReport = false;
+    removingOutliers = true;
+    enableFullDummyCoding = false;
     %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
     % 'dummy','ridgeReg';
-    stage = 'leastSq';
+    stage = 'dummy';
 end;
 
 load('data/regression.mat');
 %% Remove outliers
-outliers = getOutliers(X_train);
-X_train = X_train(outliers==0,:);
-y_train = y_train(outliers==0);
+if(removingOutliers)
+  outliers = getOutliers(X_train);
+  X_train = X_train(outliers==0,:);
+  y_train = y_train(outliers==0);
+end;
 
+%% Full dummy coding
+if(enableFullDummyCoding)
+  X_train = dummyCoding(X_train, [2,12,14,29,48,62]);
+end;
 
 %% Linear regression using gradient descent
 if (strcmp(stage, 'leastSqGD'))
@@ -125,7 +133,7 @@ if (strcmp(stage, 'ridgeReg'))
     hold on;
     plot(lvals, rmseTr, 'r');
     set(gca,'XScale', 'log');
-    title('Mispredictions for the second degreee polinom.');
+    title('Error for the second degree polynom.');
     hx = xlabel('Penalizer coefficient lambda');
     hy = ylabel('rmse');
     legend('Test error', 'Training error', 'Location', 'SouthEast');
@@ -189,9 +197,12 @@ if (strcmp(stage, 'removal'))
         rmseTr(i) = sqrt(2*mean(rmseTrSub));
     end
     [rmseStar irmseStar] = min(rmseTe);
+    [rmseTrStar irmseTrStar] = min(rmseTr);
+
 
     nfrmseBeta = leastSquares(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]));
     nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
+    fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,nfTestRMSE);
 end;
 
 %% Feature removal 2
@@ -214,10 +225,80 @@ if (strcmp(stage, 'removalcor'))
     rmseTr(i) = sqrt(2*mean(rmseTrSub));
   end
   [rmseStar irmseStar] = min(rmseTe);
+  [rmseTrStar irmseTrStar] = min(rmseTr);
 
   nfrmseBeta = leastSquares(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]));
   nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
+  fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,nfTestRMSE);
+
 end;
+
+% if (strcmp(stage, '3models'))
+% %% Separate data into three different models
+%   % Seperate data into 3 clouds
+%   id1 = 58;
+%   id2 = 43;
+%   figure;
+% %   plot(tXTr(:,id2),yTr,'o');
+% %   figure;
+% %   plot(tXTr(:,id1),yTr,'o');
+%   
+%   tXTr1 = tXTr(yTr<=5500,:);
+%   yTr1 = yTr(yTr<=5500,:);
+%   tXTr2 = tXTr(yTr>5500 & yTr<=10000 & tXTr(:,id1)>0.25,:);
+%   yTr2 = yTr(yTr>5500 & yTr<=10000 & tXTr(:,id1)>0.25,:);
+%   tXTr3 = tXTr(yTr>=10000,:);
+%   yTr3 = yTr(yTr>=10000,:);
+% %   figure;
+% %   plot(tXTr1(:,id2),yTr1,'o',tXTr2(:,id2),yTr2,'o',tXTr3(:,id2),yTr3,'o');
+% %   title('Scatter plot of tX\_train vs y\_train');
+% %   hx = xlabel('tX\_train (column id2)');
+% %   hy = ylabel('y\_train');
+% %   set(gca,'fontsize',13,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
+% %   set([hx; hy],'fontsize',13,'fontname','avantgarde','color',[.3 .3 .3]);
+% %   figure;
+% %   plot(tXTr1(:,id1),yTr1,'o',tXTr2(:,id1),yTr2,'o',tXTr3(:,id1),yTr3,'o');
+%   %% Least squares using normal equations
+%   disp('Least squares using normal equations 3 models');
+%   errorTeSub = zeros(K, 1);
+%   errorTrSub = zeros(K, 1);
+%   errorTeXSelect = zeros(K, 1);
+%   th1 = 0:0.1:1;
+%   th2 = 1:0.1:2;
+%   for i = 1:length(th1)
+%     for j = 1:length(th2)
+%       for k = 1:K
+%           [yTrTe, yTrTr, tXTrTe, tXTrTr] = split4crossValidation(k, idxCV, yTr, tXTr);
+%           % Separate into 3 models
+%           idxTr1 = find(yTrTr<=5500);
+%           idxTe1 = find(yTrTe<=5500);
+%           idxTr2 = find(yTrTr>5500 & yTrTr<=10000 & tXTrTr(:,id1)>0.25 & tXTrTr(:,id2)<6.4);
+%           idxTe2 = find(yTrTe>5500 & yTrTe<=10000 & tXTrTe(:,id1)>0.25 & tXTrTe(:,id2)<6.4);
+%           idxTr3 = find(yTrTr>=10000);
+%           idxTe3 = find(yTrTe>=10000);
+%           % Display
+%           figure;
+%           plot(tXTrTr(idxTr1,id2),yTrTr(idxTr1,:),'o',tXTrTr(idxTr2,id2),yTrTr(idxTr2,:),'o',tXTrTr(idxTr3,id2),yTrTr(idxTr3,:),'o');
+%           figure;
+%           plot(tXTrTe(idxTe1,id2),yTrTe(idxTe1,:),'o',tXTrTe(idxTe2,id2),yTrTe(idxTe2,:),'o',tXTrTe(idxTe3,id2),yTrTe(idxTe3,:),'o');
+%           % Compute one beta per model
+%           beta1 = leastSquares(yTrTr(idxTr1,:), tXTrTr(idxTr1,:));
+%           beta2 = leastSquares(yTrTr(idxTr2,:), tXTrTr(idxTr2,:));
+%           beta3 = leastSquares(yTrTr(idxTr3,:), tXTrTr(idxTr3,:));
+%           errorTrSub(k) = computeCost3Clouds(yTrTr, tXTrTr, idxTr1, idxTr2, idxTr3, beta1, beta2, beta3);
+%           errorTeSub(k) = computeCost3Clouds(yTrTe, tXTrTe, idxTe1, idxTe2, idxTe3, beta1, beta2, beta3);
+%           ypred=doPrediction(tXTrTe, beta1, beta2, beta3, th1(i), th2(j), id1, id2);
+%           e = yTrTe - ypred;
+%           errorTeXSelect(k) = e'*e/(2*length(yTrTe));
+%       end
+%       err(i,j) = sqrt(2*mean(errorTeXSelect));
+%     end
+%   end
+%   rmseTr = sqrt(2*mean(errorTrSub))
+%   rmseTe = sqrt(2*mean(errorTeSub))
+%   rmseT = min(min(err))
+% 
+% end;
 
 %% Predictions:
 if (forReport && strcmp(stage, 'leastSq'))

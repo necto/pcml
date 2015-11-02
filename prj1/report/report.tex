@@ -61,20 +61,30 @@ We also get a test set $X\_test$ of 1200 data examples for which we have to pred
 \todo{this works as an addition to the previous one.}
 % A figure reference example: Figure \ref{fig:boxplotX}
 \paragraph{Regression set} The dataset for the regression part was analyzed.
-We can notice that there are some outliers, so we build a function to remove them and later we will see if this improve the accuracy of our model.
+By looking at the histograms of the input variables, we notice that there are some outliers. A function was build to remove those and the rmse for the different methods improve slightly.
+For example with leastSquares it decreases from 1378.8 to 1370.4.
 
 Secondly we noticed that we need to normalize the input data because their distributions are not centered.
 
 Another interesting observation is the distribution of the output $\boldmath{y\_train}$ that is shown on figure \ref{fig:histogramY_train}.
 
-We investigated if dummy coding of the categorical variable can improve the results.
-
-\begin{figure}[h]	
+By looking at the correlation between the input variables and the output we see that out of the 66 input variables, two have a high correlation with the output.
+\begin{figure*}[t!]
 	\centering
-	\includegraphics[width=0.9\textwidth]{cluster.pdf}
-	\caption{Scatter plot of input vs output}
-	\label{fig:scatterIO}
-\end{figure}
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{figures/cluster.pdf}
+		\caption{Scatter plot of input vs output}\label{fig:scatterIO}
+	\end{subfigure}%
+	~ 
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{figures/histY.pdf}
+		\caption{Lorem ipsum, lorem ipsum,Lorem ipsum, lorem ipsum,Lorem ipsum}
+	\end{subfigure}
+	\caption{Caption place holder}
+\end{figure*}
+
 As we can see on figure \ref{fig:scatterIO}, the data point are grouped into 3 different clusters.
 
 
@@ -88,8 +98,56 @@ As we can see on figure \ref{fig:scatterIO}, the data point are grouped into 3 d
 %\end{figure}
 
 \section{Regression}
+To  estimate the rmse of our model with the data in hand, we split them into training and validation sets (80\% as training data and 20\% as validation) and pretend validation set is the future data.
+
+For all regression analyses, 7-fold cross-validation is used.
+
+We stared by trying the three functions that were mandatory to implement and tried to improve the results using various feature transformations. The best errors for each method are shown in Table \ref{tab:regression-errors}.
+
+The rest of this section describes the details of each of these methods.
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{l|c}
+			Method & RMSE  \\
+			\hline
+			Least Squares with Gradient Descent & 1370.1   \\
+			Least Squares & 1370.1  \\
+			Ridge regression &  1645 \\
+			1-Feature Removal &  1408.9 \\
+			X-Feature Removal &  1409 \\
+			Dummy-coding &  1409.3 \\
+		\end{tabular}
+		\caption{The best errors for the regression methods tried.}
+		\label{tab:regression-errors}
+	\end{center}
+\end{table}
+
 
 \subsection{Feature transformations}
+In order to improve the rmse of our model, we tried several feature transformations.
+
+Firstly, we try to decrease the dimensionality of the problem by sequentially removing each feature and apply cross validation to estimate the rmse with each feature removed.
+Unfortunately, feature removal does not improve our model. It is actually the opposite as the rmse increase slightly.
+
+Secondly we tried dummy coding of the categorical variables.
+As explained in the "Data description" section, the Regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
+
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{l|c}
+			Feature\# & RMSE  \\
+			\hline
+			2 &  1410.2 \\
+			12 & 1410.1 \\
+			14 &  1409.4 \\
+			29 &  1410.6 \\
+			48 &  1410.2 \\
+			62 &  1409.8 \\
+		\end{tabular}
+		\caption{RMSE for dummy coding.}
+		\label{tab:regression-dummy}
+	\end{center}
+\end{table}
 
 \section{Classification}
 
