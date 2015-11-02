@@ -54,11 +54,18 @@ Finally we experimented with feature engineering and processing with the goal of
 \end{abstract}
 
 \section{Data Description}
-\todo{probably this one shold remain present.}
+
 \paragraph{Regression} For the regression part of this project we received a dataset containing three sets named $\boldmath{X\_train, y\_train}$ and $\boldmath{X\_test}$. The pairs $\boldmath{X\_train, y\_train}$  form our training set. 
 The former contains N = 2800 sample of dimensionality D = 66 and includes 54 real, 6 binary and 6 categorical variables with a number of categories between 3 and 4.
 The later contains 2800 real variables that represent the output of $\boldmath{X\_train}$ .
 We also get a test set $X\_test$ of 1200 data examples for which we have to predict the output $\boldmath{y}$ as well as the expected RMSE for our best model.
+
+\paragraph{Classification} The dataset for the classification part of this project is quite similar to the first one.
+There is also three sets named $\boldmath{X\_train, y\_train}$ and $\boldmath{X\_test}$. 
+The pairs $\boldmath{X\_train, y\_train}$  form our training set. 
+The former contains N = 1500 sample of dimensionality D = 24 and includes 20 real, 1 binary and 3 categorical variables with a number of categories varying between 4 and 5.
+The later contains 1500 binary variables that represent the two classes in which the inputs belong.
+We also get a test set $X\_test$ of 1200 data examples and our goal is to predict in which class they belong.
 
 \section{Data visualization and cleaning}
 \todo{normalization}
@@ -68,26 +75,29 @@ We also get a test set $X\_test$ of 1200 data examples for which we have to pred
 
 The first step is to perform exploratory data analysis on the regression and classification datasets.
 \paragraph{Regression} 
-By looking at the histograms of the input variables, we notice that there are some outliers. By removing them the rmse decrease slightly.
+By looking at the histograms of the input variables, we notice that there are some outliers (41 to be exact). 
+By removing them the rmse decrease slightly.
 For example with leastSquares it decreases from 1378.8 to 1370.4.
 
-Secondly we notice that we need to normalize the input data because their distributions are not centered.
+Secondly we notice that the distributions of the input data are not centered, so we chose to normalize them.
 
 Another interesting observation is the distribution of the output $\boldmath{y\_train}$ that is shown on figure \ref{fig:histY}.
 We clearly see that the data are separated into 3 groups.
 
 We also look into the correlation between input variables and the output. We see that out of the 66 input variables, two have a high correlation with the output.
+
+The input matrix $\boldmath{X}$ is rank deficient with a rank of 55 instead of 66. This can lead to numerical issues when using methods such as least squares.
+We can fight ill-conditioning with ridge regression. The method is refer to as \textit{lifting the eigenvalues}. 
+
 \begin{figure}[!t]
 	\centering
-	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=60mm]{figures/cluster.pdf}}
-	\subfigure[Histogram of y\_train]{\label{fig:histY}\includegraphics[width=60mm]{figures/histY.pdf}}
+	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=0.4\textwidth]{figures/X58vsY.pdf}}
+	\subfigure[Histogram of y\_train]{\label{fig:histY}\includegraphics[width=0.4\textwidth]{figures/histY.pdf}}
 	\caption{Data analysis}
 \end{figure}
-As we can see on figure \ref{fig:scatterIO}, the data point are grouped into 3 different clusters.
-
 
 \section{Regression}
-To  estimate the rmse of our model with the data in hand, we split them into training and validation sets (80\% as training data and 20\% as validation) and pretend validation set is the future data.
+To  estimate the rmse of our model with the data in hand, we split them into training and validation sets (90\% as training data and 10\% as validation) and pretend validation set is the future data.
 
 For all regression analyses, 7-fold cross-validation is used.
 
@@ -111,6 +121,9 @@ The rest of this section describes the details of each of these methods.
 	\end{center}
 \end{table}
 
+\subsection{Least Squares}
+We have to be careful with least squares because the matrix is ill-conditioned.
+
 
 \subsection{Feature transformations}
 In order to improve the rmse of our model, we tried several feature transformations.
@@ -119,7 +132,7 @@ Firstly, we try to decrease the dimensionality of the problem by sequentially re
 Unfortunately, feature removal does not improve our model. It is actually the opposite as the rmse increase slightly.
 
 Secondly we tried dummy coding of the categorical variables.
-As explained in the "Data description" section, the Regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
+As explained in the "Data description section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
 
 \begin{table}[h]
 	\begin{center}
