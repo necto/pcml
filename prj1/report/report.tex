@@ -74,13 +74,12 @@ The first step is to perform exploratory data analysis on the regression and cla
 
 \paragraph{Regression} 
 By looking at the histograms of the input variables, we notice that there are some outliers (41 to be exact). 
-By removing them the RMSE decrease slightly.
-For example with leastSquares it decreases from 1378.8 to 1370.4.
+If we remove them, the RMSE does not decrease but its value slightly increases.
 
 Secondly, we notice that the distributions of the input data are not centered, so we chose to normalize them.
 
 Figure \ref{fig:scatter} show a scatter plot of one input variable vs the output and figure \ref{fig:histY} shows the histogram of the output.
-We can notice that the data are separated into 3 groups.
+We can notice that the data are separated into 3 groups. 
 
 We also look into the correlation between input variables and the output. We see that out of the 66 input variables, two have a high correlation with the output. There is variable number 42 and 57 (see figure \ref{fig:scatter}) which have respectively a correlation of 0.6216 and 0.8163.
 

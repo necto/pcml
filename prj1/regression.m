@@ -15,13 +15,15 @@ load('data/regression.mat');
 
 %% Remove outliers
 if(removingOutliers)
+  disp('Removing outliers');
   outliers = getOutliers(X_train);
   X_train = X_train(outliers==0,:);
   y_train = y_train(outliers==0);
 end;
 
 %% Full dummy coding
-if(enableFullDummyCoding)
+if(enableFullDummyCoding)  
+  disp('Enable full dummy coding');
   X_train = dummyCoding(X_train, [2,12,14,29,48,62]);
 end;
 
@@ -131,26 +133,6 @@ if (strcmp(stage, 'ridgeReg'))
     [rmseTrStar lrmseTrStar] = min(rmseTr(1,:));
     [rmseTTStar lrmseTTStar] = min(rmseTT(1,:));
     fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,rmseTTStar);
- 
-    plot(lvals, rmseTe, 'b');
-    hold on;
-    plot(lvals, rmseTr, 'r');
-    set(gca,'XScale', 'log');
-    title('Error for the second degree polynom.');
-    hx = xlabel('Penalizer coefficient lambda');
-    hy = ylabel('RMSE');
-    legend('Test error', 'Training error', 'Location', 'SouthEast');
-    set(gca,'fontsize',20,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
-    set([hx; hy],'fontsize',18,'fontname','avantgarde','color',[.3 .3 .3]);
-    grid on;
-    
-    if (forReport)
-      disp('printing the figure');
-      set(gcf, 'PaperUnits', 'centimeters');
-      set(gcf, 'PaperPosition', [0 0 20 12]);
-      set(gcf, 'PaperSize', [20 12]);
-      print -dpdf 'report/figures/ridgeRegLoss.pdf'
-    end;
   end;
 end;
 
@@ -289,7 +271,7 @@ end;
 if (strcmp(stage, 'ridgeRegCluster'))
   disp('Ridge regression using normal equations and 3 clusters');
   mvals = [2];
-  lvals = logspace(-2,5,10);
+  lvals = logspace(0,6,20);
   
   id1 = 57;
   id2 = 42;
@@ -412,16 +394,54 @@ if(forReport)
 end;
 
 %% Predictions:
-if (forReport && strcmp(stage, 'leastSq'))
-    [XTrn, XTrn_mean, XTrn_std] = normalize(X_train);
-    Xtst = adjust(X_test, XTrn_mean, XTrn_std);
-    tXTrn = [ones(size(XTrn, 1), 1) XTrn];
-    tXtst = [ones(size(Xtst, 1), 1) Xtst];
+if (forReport && strcmp(stage, 'ridgeRegCluster'))
+  [XTrn, XTrn_mean, XTrn_std] = normalize(X_train);
+  Xtst = adjust(X_test, XTrn_mean, XTrn_std);
+  tXTrn = [ones(size(XTrn, 1), 1) XTrn];
+  tXtst = [ones(size(Xtst, 1), 1) Xtst];
 
-    beta = leastSquares(y_train, tXTrn);
-    predictions = tXtst*beta;
-    csvwrite('predictions_regression_1.csv', predictions);
-    errFile = fopen('test_errors_regression_1.csv', 'wt');
-    fprintf(errFile, 'rmse,%d', lSqTestRMSE);
+    
+  disp('Do predictions');
+  mvals = [2];
+  lvals = logspace(0,6,20);
+  id1 = 57;id2 = 42;
+  [idxTr,C] = kmeans(horzcat(XTrn(:,[id1 id2]),y_train),3);
+  C = C(:,[1 2]);
+%   figure;
+%   plot(XTrn(idxTr==1,id2),y_train(idxTr==1),'o',XTrn(idxTr==2,id2),y_train(idxTr==2),'o',XTrn(idxTr==3,id2),y_train(idxTr==3),'o');
+%   figure;
+%   plot(XTrn(idxTr==1,id1),y_train(idxTr==1),'o',XTrn(idxTr==2,id1),y_train(idxTr==2),'o',XTrn(idxTr==3,id1),y_train(idxTr==3),'o');
+  idxTe = whichCluster(C, tXtst);
+
+  rmseTe = zeros(size(mvals,2), size(lvals,2));
+  rmseTr = zeros(size(mvals,2), size(lvals,2));
+  for j = 1:length(mvals)
+    m = mvals(j);
+    pXTr = myPoly(tXTrn, m);
+    pXTe = myPoly(tXtst, m);
+    for l = 1:length(lvals)
+      disp('tic');
+      lambda = lvals(l);
+      b = ridgeRegression(y_train, pXTr, lambda);
+      b1 = ridgeRegression(y_train(idxTr==1), pXTr(idxTr==1,:), lambda);
+      b2 = ridgeRegression(y_train(idxTr==2), pXTr(idxTr==2,:), lambda);
+      b3 = ridgeRegression(y_train(idxTr==3), pXTr(idxTr==3,:), lambda);  
+
+      rmseTr(j,l) = sqrt(2*computeCost3Clusters(y_train, pXTr, idxTr, b1, b2, b3));
+      rmseTT(j,l) = sqrt(2*computeCost(y_train,pXTr,b));
+    end;
+    [rmseTrStar lrmseTrStar] = min(rmseTr(1,:));
+    [rmseTTStar lrmseTTStar] = min(rmseTT(1,:));
+    fprintf('Train RMSE: %d\nTT    RMSE: %d\n',rmseTrStar,rmseTTStar);
+  
+    predictions = zeros(size(pXTe,1),1);
+    predictions(idxTe==1)= pXTe(idxTe==1,:)*b1;
+    predictions(idxTe==2)= pXTe(idxTe==2,:)*b2;
+    predictions(idxTe==3)= pXTe(idxTe==3,:)*b3;
+    
+    csvwrite('predictions_regression.csv', predictions);
+    errFile = fopen('test_errors_regression.csv', 'wt');
+    fprintf(errFile, 'rmse,%d', rmseStar);
     fclose(errFile);
+  end;
 end;
