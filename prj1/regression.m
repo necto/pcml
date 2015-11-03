@@ -6,7 +6,7 @@ else
     forReport = false;
     %Possible values: 'leastSqGD', 'leastSq', 'leastSqCluster', 'removal', 'removalcor', 
     % 'dummy','ridgeReg','ridgeRegCluster';
-    stage = 'leastSqCluster';
+    stage = 'removal';
 end;
 removingOutliers = false;
 enableFullDummyCoding = false;
@@ -24,7 +24,7 @@ end;
 %% Full dummy coding
 if(enableFullDummyCoding)  
   disp('Enable full dummy coding');
-  X_train = dummyCoding(X_train, [2,12,14,29,48,62]);
+  X_train = dummyCoding(X_train, [2,12,14]);
 end;
 
 %% Linear regression using gradient descent
@@ -138,55 +138,75 @@ end;
 
 %% Dummy coding
 if (strcmp(stage, 'dummy'))
+    disp('Dummy coding');
     discFeatures = [2,12,14,29,48,62];
+    m = 2;
+    lvals = logspace(0,6,5);
+    id1 = 58;
+    id2 = 43;
+    [idxTr,C] = kmeans(horzcat(tXTr(:,[id1 id2]),yTr),3);
+    C = C(:,[1 2]);
+    idxTe = whichCluster(C, tXTe);
+
     for i = 1:length(discFeatures)
+        disp('Next feature');
         dXTr = tXTr;
         dXTe = tXTe;
         for v = unique(XTr(:, discFeatures(i)))'
             dXTr(:,size(dXTr, 2)+1) = (XTr(:,discFeatures(i)) == v);
             dXTe(:,size(dXTe, 2)+1) = (XTe(:,discFeatures(i)) == v);
         end;
-        for k = 1:K
-            [yTrTe, yTrTr, dXTrTe, dXTrTr] = split4crossValidation(k, idxCV, yTr, dXTr);
+        
+        pXTr = myPoly(dXTr, m);
+        pXTe = myPoly(dXTe, m);
+        for l = 1:length(lvals)
+          lambda = lvals(l);
+          b1 = ridgeRegression(yTr(idxTr==1), pXTr(idxTr==1,:), lambda);
+          b2 = ridgeRegression(yTr(idxTr==2), pXTr(idxTr==2,:), lambda);
+          b3 = ridgeRegression(yTr(idxTr==3), pXTr(idxTr==3,:), lambda);  
 
-            beta = leastSquares(yTrTr, dXTrTr);
-
-            rmseTrSub(k) = computeCost(yTrTr, dXTrTr, beta);
-            rmseTeSub(k) = computeCost(yTrTe, dXTrTe, beta);
-        end;
-        rmseTe(i) = sqrt(2*mean(rmseTeSub));
-        rmseTr(i) = sqrt(2*mean(rmseTrSub));
-        beta = leastSquares(yTr, dXTr);
-        rmseTT(i) = sqrt(2*computeCost(yTe, dXTe, beta));
-    end;
+          rmseTe(l) = sqrt(2*computeCost3Clusters(yTe, pXTe, idxTe, b1, b2, b3));
+          rmseTr(l) = sqrt(2*computeCost3Clusters(yTr, pXTr, idxTr, b1, b2, b3));
+        end
     [rmseStar lrmseStar] = min(rmseTe(1,:));
     [rmseTrStar lrmseTrStar] = min(rmseTr(1,:));
-    [rmseTTStar lrmseTTStar] = min(rmseTT(1,:));
-    fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,rmseTTStar);
+    rmseTeFeature(i) = rmseStar;
+    fprintf('Feature %d\nTest  RMSE: %d\nTrain RMSE: %d\n',i,rmseStar,rmseTrStar);
+    end;
 end;
 
 %% Feature removal
 if (strcmp(stage, 'removal'))
+  id1 = 57;
+  id2 = 42;
+  % Separate all input into 3 clusters using kmeans.
+  [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
+  C = C(:,[1 2]);
+  idxTe = whichCluster(C, tXTe);
     for i = 1:size(tXTr,2)
-        errorTeSub = zeros(K, 1);
-        errorTrSub = zeros(K, 1);
-        rXTr = tXTr(:,[1:i-1 i+1:end]);
-        for k = 1:K
-            [yTrTe, yTrTr, rXTrTe, rXTrTr] = split4crossValidation(k, idxCV, yTr, rXTr);
-
-            beta = leastSquares(yTrTr, rXTrTr);
-            rmseTrSub(k) = computeCost(yTrTr, rXTrTr, beta);
-            rmseTeSub(k) = computeCost(yTrTe, rXTrTe, beta);
-        end;
-        rmseTe(i) = sqrt(2*mean(rmseTeSub));
-        rmseTr(i) = sqrt(2*mean(rmseTrSub));
-    end
-    [rmseStar irmseStar] = min(rmseTe);
-    [rmseTrStar irmseTrStar] = min(rmseTr);
-    
-    nfrmseBeta = leastSquares(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]));
-    nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
-    fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,nfTestRMSE);
+      errorTeSub = zeros(K, 1);
+      errorTrSub = zeros(K, 1);
+      rXTr = tXTr(:,[1:i-1 i+1:end]);
+      rXTe = tXTe(:,[1:i-1 i+1:end]);
+      
+      seeds = [1:10 42 43 7500 100500];
+      errorTe3 = zeros(length(seeds), 1);
+      errorTr3 = zeros(length(seeds), 1);
+      for s = 1:length(seeds)
+        seed = seeds(s);
+        b1 = leastSquares(yTr(idxTr==1), rXTr(idxTr==1,:));
+        b2 = leastSquares(yTr(idxTr==2), rXTr(idxTr==2,:));
+        b3 = leastSquares(yTr(idxTr==3), rXTr(idxTr==3,:));
+        
+        errorTe3(s) = computeCost3Clusters( yTe, rXTe, idxTe, b1, b2, b3);
+        errorTr3(s) = computeCost3Clusters( yTr, rXTr, idxTr, b1, b2, b3);
+      end;
+      lSqTestRMSE3 = sqrt(2*mean(errorTe3));
+      lSqTrainRMSE3 = sqrt(2*mean(errorTr3));
+      rmseTeFeature(i) = lSqTestRMSE3;
+      rmseTrFeature(i) = lSqTrainRMSE3;
+    end;
+    fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',min(rmseTeFeature),min(rmseTrFeature));
 end;
 
 %% Feature removal 2
@@ -399,8 +419,7 @@ if (forReport && strcmp(stage, 'ridgeRegCluster'))
   Xtst = adjust(X_test, XTrn_mean, XTrn_std);
   tXTrn = [ones(size(XTrn, 1), 1) XTrn];
   tXtst = [ones(size(Xtst, 1), 1) Xtst];
-
-    
+  
   disp('Do predictions');
   mvals = [2];
   lvals = logspace(0,6,20);
