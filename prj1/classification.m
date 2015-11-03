@@ -29,7 +29,7 @@ if (strcmp(stage, 'logReg'))
         tXTr = [ones(size(XTr, 1), 1) XTr];
         tXTe = [ones(size(XTe, 1), 1) XTe];
 
-        lrBeta = logisticRegression(yTr, tXTr, 1, 1e-5);
+        lrBeta = logisticRegressionEx(yTr, tXTr, 1, 1e-5);
 
         lrY = sigmoid(tXTe * lrBeta) > 0.5;
         [lrTestRMSE(s), lrTest01(s), lrTestLog(s)] = classificationLosses(tXTe, lrBeta, yTe);
@@ -80,14 +80,14 @@ if (strcmp(stage, 'dummy'))
         for k = 1:K
             [yTrTe, yTrTr, dXTrTe, dXTrTr] = split4crossValidation(k, idxCV, yTr, dXTr);
 
-            beta = logisticRegression(yTrTr, dXTrTr, 1e-1, 1e-6);
+            beta = logisticRegressionEx(yTrTr, dXTrTr, 1e-1, 1e-6);
 
             [rmseTrSub(k), zeroOneTrSub(k), logTrSub(k)] = classificationLosses(dXTrTr, beta, yTrTr);
             [rmseTeSub(k), zeroOneTeSub(k), logTeSub(k)] = classificationLosses(dXTrTe, beta, yTrTe);
         end;
         rmseTe(i) = mean(rmseTeSub); zeroOneTe(i) = mean(zeroOneTeSub); logTe(i) = mean(logTeSub)
         rmseTr(i) = mean(rmseTrSub); zeroOneTr(i) = mean(zeroOneTrSub); logTr(i) = mean(logTrSub);
-        trBeta = logisticRegression(yTr, dXTr, 1e-1, 1e-6);
+        trBeta = logisticRegressionEx(yTr, dXTr, 1e-1, 1e-6);
         [rmseTT(i), zeroOneTT(i), logTT(i)] = classificationLosses(dXTe, trBeta, yTe);
     end;
 end;
@@ -101,7 +101,7 @@ if (strcmp(stage, 'removal'))
         for k = 1:K
             [yTrTe, yTrTr, rXTrTe, rXTrTr] = split4crossValidation(k, idxCV, yTr, rXTr);
 
-            beta = logisticRegression(yTrTr, rXTrTr, 1e-1, 1e-6);
+            beta = logisticRegressionEx(yTrTr, rXTrTr, 1e-1, 1e-6);
             [rmseTrSub(k), zeroOneTrSub(k), logTrSub(k)] = classificationLosses(rXTrTr, beta, yTrTr);
             [rmseTeSub(k), zeroOneTeSub(k), logTeSub(k)] = classificationLosses(rXTrTe, beta, yTrTe);
         end;
@@ -112,11 +112,11 @@ if (strcmp(stage, 'removal'))
     [zeroOneStar i01Star] = min(zeroOneTe);
     [logStar ilogStar] = min(logTe);
 
-    nfrmseBeta = logisticRegression(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]), 1e-1, 1e-5);
+    nfrmseBeta = logisticRegressionEx(yTr, tXTr(:, [1:irmseStar-1 irmseStar+1:end]), 1e-1, 1e-5);
     [nfTestRMSE, ~, ~] = classificationLosses(tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta, yTe)
-    nf01Beta = logisticRegression(yTr, tXTr(:, [1:i01Star-1 i01Star+1:end]), 1e-1, 1e-5);
+    nf01Beta = logisticRegressionEx(yTr, tXTr(:, [1:i01Star-1 i01Star+1:end]), 1e-1, 1e-5);
     [~, noFeatureTest01, ~] = classificationLosses(tXTe(:, [1:i01Star-1 i01Star+1:end]), nf01Beta, yTe)
-    nflogBeta = logisticRegression(yTr, tXTr(:, [1:ilogStar-1 ilogStar+1:end]), 1e-1, 1e-5);
+    nflogBeta = logisticRegressionEx(yTr, tXTr(:, [1:ilogStar-1 ilogStar+1:end]), 1e-1, 1e-5);
     [~, ~, nflogTest] = classificationLosses(tXTe(:, [1:ilogStar-1 ilogStar+1:end]), nflogBeta, yTe)
 end;
 
@@ -139,7 +139,7 @@ if (strcmp(stage, 'polynomial'))
                 [yTrTe, yTrTr, pXTrTe, pXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
 
                 alpha = alphas(j);
-                beta = penLogisticRegression(yTrTr, pXTrTr, alpha/lambda, lambda, 1e-7/lambda);
+                beta = penLogisticRegressionEx(yTrTr, pXTrTr, alpha/lambda, lambda, 1e-7/lambda);
 
                 [rmseTrSub(k), zeroOneTrSub(k), logTrSub(k)] = classificationLosses(pXTrTr, beta, yTrTr);
                 [rmseTeSub(k), zeroOneTeSub(k), logTeSub(k)] = classificationLosses(pXTrTe, beta, yTrTe);
@@ -154,9 +154,9 @@ if (strcmp(stage, 'polynomial'))
     [zeroOneStar l01Star] = min(zeroOneTe(1,:));
     [logStar llogStar] = min(logTe(1,:));
 
-    [cvPolyTestrmse, ~, ~] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(lrmseStar), 1e-4), yTe)
-    [~, cvPolyTest01, ~] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(l01Star), 1e-4), yTe)
-    [~, ~, cvPolyTestlog] = classificationLosses(pXTe, penLogisticRegression(yTr, pXTr, 1e-1, lvals(llogStar), 1e-4), yTe)
+    [cvPolyTestrmse, ~, ~] = classificationLosses(pXTe, penLogisticRegressionEx(yTr, pXTr, 1e-1, lvals(lrmseStar), 1e-4), yTe)
+    [~, cvPolyTest01, ~] = classificationLosses(pXTe, penLogisticRegressionEx(yTr, pXTr, 1e-1, lvals(l01Star), 1e-4), yTe)
+    [~, ~, cvPolyTestlog] = classificationLosses(pXTe, penLogisticRegressionEx(yTr, pXTr, 1e-1, lvals(llogStar), 1e-4), yTe)
 
     %pXTe = [ones(size(XTe, 1), 1) myPoly(XTe, 2)];
     %pXTe = myPoly(tXTe, m);
@@ -193,7 +193,7 @@ if (strcmp(stage, 'penLogReg'))
             [yTrTe, yTrTr, tXTrTe, tXTrTr] = split4crossValidation(k, idxCV, yTr, tXTr);
 
             alpha = 1e-2/sqrt(sqrt(lambda));
-            beta = penLogisticRegression(yTrTr, tXTrTr, alpha, lambda, 1e-7);
+            beta = penLogisticRegressionEx(yTrTr, tXTrTr, alpha, lambda, 1e-7);
 
             [rmseTrSub(k), zeroOneTrSub(k), logTrSub(k)] = classificationLosses(tXTrTr, beta, yTrTr);
             [rmseTeSub(k), zeroOneTeSub(k), logTeSub(k)] = classificationLosses(tXTrTe, beta, yTrTe);
@@ -207,9 +207,9 @@ if (strcmp(stage, 'penLogReg'))
     [zeroOneStar l01Star] = min(zeroOneTe);
     [logStar llogStar] = min(logTe);
 
-    [cvPenTestrmse, ~, ~] = classificationLosses(tXTe, penLogisticRegression(yTr, tXTr, 1e-1, lvals(lrmseStar), 1e-10), yTe)
-    [~, cvPenTest01, ~] = classificationLosses(tXTe, penLogisticRegression(yTr, tXTr, 1e-1, lvals(l01Star), 1e-10), yTe)
-    [~, ~, cvPenTestlog] = classificationLosses(tXTe, penLogisticRegression(yTr, tXTr, 1e-1, lvals(llogStar), 1e-10), yTe)
+    [cvPenTestrmse, ~, ~] = classificationLosses(tXTe, penLogisticRegressionEx(yTr, tXTr, 1e-1, lvals(lrmseStar), 1e-10), yTe)
+    [~, cvPenTest01, ~] = classificationLosses(tXTe, penLogisticRegressionEx(yTr, tXTr, 1e-1, lvals(l01Star), 1e-10), yTe)
+    [~, ~, cvPenTestlog] = classificationLosses(tXTe, penLogisticRegressionEx(yTr, tXTr, 1e-1, lvals(llogStar), 1e-10), yTe)
 
     plot(lvals, logTe, 'b');
     hold on;
@@ -242,7 +242,7 @@ if (forReport && strcmp(stage, 'logReg'))
     tXTrn = [ones(size(XTrn, 1), 1) XTrn];
     tXtst = [ones(size(Xtst, 1), 1) Xtst];
 
-    lrBeta = logisticRegression(y_train, tXTrn, 0.1, 1e-6);
+    lrBeta = logisticRegressionEx(y_train, tXTrn, 0.1, 1e-6);
     predictions = sigmoid(tXtst*lrBeta) > 0.5;
     predictions = predictions*2 - 1;
     csvwrite('predictions_classification.csv', predictions);

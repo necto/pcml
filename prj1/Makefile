@@ -46,10 +46,12 @@ istanbul.zip: predictions_regression.csv test_errors_regression.csv predictions_
 	cp leastSquares.m submission/
 	cp ridgeRegression.m submission/
 	cp logisticRegression.m submission/
+	cp logisticRegressionEx.m submission/
 	cp logisticRegLoss.m submission/
 	cp sigmoid.m submission/
 	cp log1PlusExp.m submission/
 	cp penLogisticRegression.m submission/
+	cp penLogisticRegressionEx.m submission/
 	cp penLogisticRegLoss.m submission/
 	cp predictions_regression.csv submission/
 	cp test_errors_regression.csv submission/
