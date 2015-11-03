@@ -78,7 +78,7 @@ If we remove them, the RMSE does not decrease but its value slightly increases.
 
 Secondly, we notice that the distributions of the input data are not centered, so we chose to normalize them.
 
-Figure \ref{fig:scatter} show a scatter plot of one input variable vs the output and figure \ref{fig:histY} shows the histogram of the output.
+Figure \ref{fig:scatter} shows a scatter plot of one input variable vs the output and figure \ref{fig:histY} shows the histogram of the output.
 We can notice that the data are separated into 3 groups. 
 
 We also look into the correlation between input variables and the output. We see that out of the 66 input variables, two have a high correlation with the output. There is variable number 42 and 57 (see figure \ref{fig:scatter}) which have respectively a correlation of 0.6216 and 0.8163.
@@ -87,7 +87,7 @@ The input matrix $\boldmath{X}$ is rank deficient with a rank of 55 instead of 6
 We can fight ill-conditioning with ridge regression. 
 
 \paragraph{Classification}
-The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we apply a simple transformation: ${(y + 1)\over 2} \in \{0, 1\}$. Another observation is that the standard deviation of different dimensions varies significantly: from 0.5 upto 874, so we normalize the input data, to get rid of the scale bias. Finally we add a constant feature $X_0 \equiv 1$.
+The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we apply a simple transformation: ${(y + 1)\over 2} \in \{0, 1\}$. Another observation is that the standard deviation of different dimensions varies significantly: from 0.5 up to 874, so we normalize the input data, to get rid of the scale bias. Finally we add a constant feature $X_0 \equiv 1$.
 
 \begin{figure}[!t]
 	\centering
@@ -99,8 +99,8 @@ The output range is $\{-1, 1\}$, to make it suitable for logistic regression, we
 \section{Regression}
 The implementation of least squares, least squares using gradient descent and ridge regression is mandatory for this project.
 
-We start by applying those three methods to the data and visualize the results  as well as compute tests errors using cross validation.
-To  estimate the RMSE of our model with the data in hand, we split them into training and validation sets and pretend validation set is the future data.
+We start by applying those three methods to the data and visualize the results as well as compute tests errors using cross validation.
+To  estimate the RMSE of our model with the data in hand, we split them into training and validation sets (90\% and 10\%, respectively) and pretend validation set is the future data. 
 
 The best errors for each method are shown in Table \ref{tab:regression-errors}.
 
@@ -125,7 +125,7 @@ The rest of this section describes the details of each of these methods.
 		\caption{The best errors for the regression methods tried.}
 		\label{tab:regression-errors}
 	\end{center}
-	
+
 	\end{minipage}
 	\begin{minipage}{.5\linewidth}
 		\centering
@@ -139,9 +139,9 @@ The rest of this section describes the details of each of these methods.
 			14 &  502.8398 \\
 			29 &  504.5128 \\
 			48 &  506.7297 \\
-			62 &  505.8062 \\
+			62 &  505.8062 
 		\end{tabular}
-		\caption{RMSE for dummy coding.}
+		\caption{RMSE for dummy coding(ridge regression with 3 models)}
 		\label{tab:regression-dummy}
 	\end{center}
 	
@@ -153,14 +153,30 @@ The rest of this section describes the details of each of these methods.
 As explained in the ``Data visualization and cleaning" section, the matrix $\boldmath{X\_train}$ is ill-conditioned.
 This is problematic with least squares because it can lead to wrong results.
 
-In Table \ref{tab:regression-errors} we see that both Least Squares and Least Squares with gradient descent have the best RMSE even though the matrix is rank deficient.
+In Table \ref{tab:regression-errors} we see that both least squares and least squares with gradient descent have a better RMSE than ridge regression even though the matrix is rank deficient.
 
 \subsection{Ridge Regression}
 
-For our dataset, Ridge regression performance is worse than Least Squares.
-Figure \ref{fig:ridgeRegError} shows the results obtained with ridge regression for a polynomial of degree 2 and a training set of 90\% of the data, the rest being the testing set. $\lambda$ varies from $10$ to $10^{5}$ with a total of 20 points in between. 
+On our dataset, ridge regression offers an estimated RMSE of 1631.55. 
+We were expecting a better result than least square because of the ill-conditioning of the matrix.
+Even though the result is better in that case, it may not work if there are more testing data.
+
+\subsection{Separating into 3 models}
+
+As described in the ``Data visualization and cleaning'' section, the data are separated into three clusters (see figure \ref{fig:scatter}).
+In order to improve the predictions accuracy, we tried to build one model for each of these cluster.
+First of all, we use k-means clustering on the training set to find the three clusters and their centroids.
+
+When we want to make a prediction for a new input, we have to first decide which model we have to use or, in other words, which cluster this input belongs to.
+We achieve that by looking at the variables number 42 and 57. 
+Figure \ref{fig:scatter} shows a scatter plot of the variable 57 and the output. We can guess the points belonging to the yellow cluster because it is separated from the two others. The same can be done for the blue cluster with the feature 42.
+When a new input come, we compute its euclidean distance with the centroids of the clusters and assign the point to the nearest cluster.
+
+We tried to use both least squares and ridge regression to do the predictions and it appears that ridge regression performs better (see table \ref{tab:regression-errors} for results).
+
+Figure \ref{fig:ridgeRegError} shows the results obtained with ridge regression for a polynomial of degree 2 and a training set of 90\% of the data, the rest being the testing set. $\lambda$ varies from $1$ to $10^{6}$ with a total of 20 points in between. 
 There is only 20 points because the computation is expensive. Indeed with a degree 2, we have 4356 features and 287496 for degree 3.
-On the plot we can see that the RMSE min is around 1650 for a $\lambda$ of $10^{3}$.
+On the plot we can see that the RMSE min is around 500.
 
 \begin{figure}[!t]
 	\center
@@ -173,21 +189,13 @@ On the plot we can see that the RMSE min is around 1650 for a $\lambda$ of $10^{
 \subsection{Feature transformations}
 In order to improve the RMSE of our model, we tried several feature transformations.
 
-Firstly, we try to decrease the dimensionality of the problem by sequentially removing each feature and apply cross validation to estimate the RMSE with each feature removed.
+Firstly, we try to decrease the dimensionality of the problem by sequentially removing each feature and apply cross validation with ridge regression to estimate the RMSE with each feature removed.
 Unfortunately, feature removal does not improve our model. It is actually the opposite as the RMSE increase slightly.
 
 Secondly, we tried dummy coding of the categorical variables.
 As explained in the ``Data description" section, the regression set's input has 6 categorical variables each with a number of categories between 3 and 4.
-We apply dummy coding to each of these variables and compute the new RMSE.
-Table \ref{tab:regression-dummy} shows that again there is no improvements.
-
-For the regression part we tried a last approach.
-Figure \ref{fig:scatter} and \ref{fig:histY} show that the data are separated into three clusters. And there is a high correlation between variables number 42, 57 and the output.
-We tried to define 3 models, one for each cluster. 
-When we want to make a prediction for a new input, we have to first decide which model we have to use.
-We did this by looking at the features number 42 and 57. 
-For example in figure \ref{fig:scatter} we can guess which points belong to the yellow cloud by looking at the feature 57 of X\_train, because the yellow cluster is separated from the two others. We can do the same for the blue cloud with the feature 42.
-Unfortunately the RMSE was not better than least square.
+We apply dummy coding to each of these variables and compute the new RMSE using ridge regression.
+Table \ref{tab:regression-dummy} shows that there is a slight improvement for features number 2, 12 and 14. 
 
 \section{Classification}
 
@@ -255,7 +263,7 @@ The last transformation tried is {\bf polynomial}. Monomial basis can theoretica
 
 In this report, we studied a number of classification and regression methods and found that logistic regression is the best fit for our classification problem and least squares gives the best results on the regression data. The Table~\ref{tab:classification-errors} shows that you should prefer a penalized logistic regression only if you measure the logLoss, and the tried feature transformation did not improve the best model. We expect our predictions to be 12$\pm$3\% off on the test dataset.
 
-The table \ref{tab:regression-errors} shows that least squares offer the lowest RMSE. But as the matrix is ill-conditioned we have to be careful because it can gives wrong results. 
-We expect the RMSE of our predictions to be 1370.14 ($\pm$ 9\%).
+The table \ref{tab:regression-errors} shows that ridge regression with 3 models and dummy coding of the feature number 2 offer the lowest RMSE.
+We calculated the RMSE with different seed and we expect for our predictions a RMSE of 504.3773 ($\pm$ 12\%).
 
 \end{document}

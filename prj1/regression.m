@@ -3,13 +3,14 @@ if (exist('reportMode', 'var') == 1)
 else
     clear all;
     close all;
-    forReport = false;
+    forReport = true;
     %Possible values: 'leastSqGD', 'leastSq', 'leastSqCluster', 'removal', 'removalcor', 
     % 'dummy','ridgeReg','ridgeRegCluster';
-    stage = 'removal';
+    stage = 'ridgeRegCluster';
 end;
 removingOutliers = false;
-enableFullDummyCoding = false;
+enableDummyCoding = false;
+removeFeatures = false;
 
 load('data/regression.mat');
 
@@ -22,9 +23,17 @@ if(removingOutliers)
 end;
 
 %% Full dummy coding
-if(enableFullDummyCoding)  
-  disp('Enable full dummy coding');
-  X_train = dummyCoding(X_train, [2,12,14]);
+if(enableDummyCoding)  
+  disp('Enable dummy coding');
+  % Categorical features: [2,12,14,29,48,62]
+  X_train = dummyCoding(X_train, [62]);
+end;
+
+%% Remove features
+if(removeFeatures)  
+  disp('Remove features');
+  f = 1;
+  X_train = X_train(:,[2:end]);
 end;
 
 %% Linear regression using gradient descent
@@ -79,7 +88,7 @@ if (strcmp(stage, 'leastSq'))
 end;
 
 %% Split data into train and validation sets
-[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.9, 42);
+[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.9, 47);
 % Normalize data
 [XTr, XTr_mean, XTr_std] = normalize(XTr);
 XTe = adjust(XTe, XTr_mean, XTr_std);
@@ -101,7 +110,7 @@ end;
 if (strcmp(stage, 'ridgeReg'))
   disp('Ridge regression using normal equations');
   mvals = [2];
-  lvals = logspace(1,5,20);
+  lvals = logspace(1,5,5);
   
   errorTe = zeros(K, 1);
   errorTr = zeros(K, 1);
@@ -142,11 +151,11 @@ if (strcmp(stage, 'dummy'))
     discFeatures = [2,12,14,29,48,62];
     m = 2;
     lvals = logspace(0,6,5);
-    id1 = 58;
-    id2 = 43;
+    id1 = id1+1; % With tX there is one more column
+    id2 = id2+1;
     [idxTr,C] = kmeans(horzcat(tXTr(:,[id1 id2]),yTr),3);
     C = C(:,[1 2]);
-    idxTe = whichCluster(C, tXTe);
+    idxTe = whichCluster(C, tXTe, id1, id2);
 
     for i = 1:length(discFeatures)
         disp('Next feature');
@@ -177,8 +186,6 @@ end;
 
 %% Feature removal
 if (strcmp(stage, 'removal'))
-  id1 = 57;
-  id2 = 42;
   % Separate all input into 3 clusters using kmeans.
   [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
   C = C(:,[1 2]);
@@ -239,8 +246,6 @@ end;
 
 %% Least square with 3 models, one for each cluster
 if (strcmp(stage, 'leastSqCluster'))
-  id1 = 57;
-  id2 = 42;
   % Separate all input into 3 clusters using kmeans.
   [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
   C = C(:,[1 2]);
@@ -291,8 +296,7 @@ end;
 if (strcmp(stage, 'ridgeRegCluster'))
   disp('Ridge regression using normal equations and 3 clusters');
   mvals = [2];
-  lvals = logspace(0,6,20);
-  
+  lvals = logspace(0,6,10);   
   id1 = 57;
   id2 = 42;
   [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
@@ -302,6 +306,8 @@ if (strcmp(stage, 'ridgeRegCluster'))
 %   figure;
 %   plot(XTr(idxTr==1,id1),yTr(idxTr==1),'o',XTr(idxTr==2,id1),yTr(idxTr==2),'o',XTr(idxTr==3,id1),yTr(idxTr==3),'o');
   idxTe = whichCluster(C, tXTe);
+%   figure;
+%   plot(XTe(idxTe==1,id1),yTe(idxTe==1),'o',XTe(idxTe==2,id1),yTe(idxTe==2),'o',XTe(idxTe==3,id1),yTe(idxTe==3),'o');
 
   rmseTe = zeros(size(mvals,2), size(lvals,2));
   rmseTr = zeros(size(mvals,2), size(lvals,2));
@@ -381,8 +387,6 @@ if(forReport)
   set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/CorrelationXY.pdf'
   %% 3 clouds
-  id1 = 57;
-  id2 = 42;
   XTr1 = XTr(yTr<=5500,:);
   yTr1 = yTr(yTr<=5500,:);
   XTr2 = XTr(yTr>5500 & yTr<=10000 & XTr(:,id1)>0.25 & XTr(:,id2)<6.4,:);
@@ -423,14 +427,14 @@ if (forReport && strcmp(stage, 'ridgeRegCluster'))
   disp('Do predictions');
   mvals = [2];
   lvals = logspace(0,6,20);
-  id1 = 57;id2 = 42;
   [idxTr,C] = kmeans(horzcat(XTrn(:,[id1 id2]),y_train),3);
   C = C(:,[1 2]);
 %   figure;
 %   plot(XTrn(idxTr==1,id2),y_train(idxTr==1),'o',XTrn(idxTr==2,id2),y_train(idxTr==2),'o',XTrn(idxTr==3,id2),y_train(idxTr==3),'o');
 %   figure;
 %   plot(XTrn(idxTr==1,id1),y_train(idxTr==1),'o',XTrn(idxTr==2,id1),y_train(idxTr==2),'o',XTrn(idxTr==3,id1),y_train(idxTr==3),'o');
-  idxTe = whichCluster(C, tXtst);
+  assert(id1==42 && id2==57);
+  idxTe = whichCluster(C, tXtst ,id1, id2);
 
   rmseTe = zeros(size(mvals,2), size(lvals,2));
   rmseTr = zeros(size(mvals,2), size(lvals,2));
@@ -460,7 +464,8 @@ if (forReport && strcmp(stage, 'ridgeRegCluster'))
     
     csvwrite('predictions_regression.csv', predictions);
     errFile = fopen('test_errors_regression.csv', 'wt');
-    fprintf(errFile, 'rmse,%d', rmseStar);
+    rmse = 691.5655; % average of several measure with different seeds
+    fprintf(errFile, 'rmse,%d', rmse);
     fclose(errFile);
   end;
 end;
