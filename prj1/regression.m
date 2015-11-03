@@ -3,10 +3,10 @@ if (exist('reportMode', 'var') == 1)
 else
     clear all;
     close all;
-    forReport = true;
-    %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
-    % 'dummy','ridgeReg';
-    stage = 'leastSq';
+    forReport = false;
+    %Possible values: 'leastSqGD', 'leastSq', 'leastSqCluster', 'removal', 'removalcor', 
+    % 'dummy','ridgeReg','ridgeRegCluster';
+    stage = 'leastSqCluster';
 end;
 removingOutliers = false;
 enableFullDummyCoding = false;
@@ -233,6 +233,117 @@ if (strcmp(stage, 'removalcor'))
   nfTestRMSE = sqrt(2*mean(computeCost(yTe, tXTe(:, [1:irmseStar-1 irmseStar+1:end]), nfrmseBeta)));
   fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,nfTestRMSE);
 
+end;
+
+%% Least square with 3 models, one for each cluster
+if (strcmp(stage, 'leastSqCluster'))
+  id1 = 57;
+  id2 = 42;
+  % Separate all input into 3 clusters using kmeans.
+  [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
+  C = C(:,[1 2]);
+  
+% Plot of the clusters
+% figure;
+% plot(XTr(idxTr==1,id2),yTr(idxTr==1),'o',XTr(idxTr==2,id2),yTr(idxTr==2),'o',XTr(idxTr==3,id2),yTr(idxTr==3),'o');
+% figure;
+% plot(XTr(idxTr==1,id1),yTr(idxTr==1),'o',XTr(idxTr==2,id1),yTr(idxTr==2),'o',XTr(idxTr==3,id1),yTr(idxTr==3),'o');
+  %% 
+  seeds = [1:10 42 43 7500 100500];
+  errorTe = zeros(length(seeds), 1);
+  errorTr = zeros(length(seeds), 1);
+  errorTe3 = zeros(length(seeds), 1);
+  errorTr3 = zeros(length(seeds), 1);
+
+  for s = 1:length(seeds)
+    seed = seeds(s);
+
+    b = leastSquares(yTr, tXTr);
+    b1 = leastSquares(yTr(idxTr==1), tXTr(idxTr==1,:));
+    b2 = leastSquares(yTr(idxTr==2), tXTr(idxTr==2,:));
+    b3 = leastSquares(yTr(idxTr==3), tXTr(idxTr==3,:));
+
+    errorTe(s) = computeCost( yTe, tXTe, b );
+    errorTr(s) = computeCost( yTr, tXTr, b );
+
+    idxTe = whichCluster(C, tXTe);
+    errorTe3(s) = computeCost3Clusters( yTe, tXTe, idxTe, b1, b2, b3);
+    errorTr3(s) = computeCost3Clusters( yTr, tXTr, idxTr, b1, b2, b3);
+
+  %   figure;
+  %   plot(tXTe(:,id2+1),tXTe(:,id1+1),'o');
+  %   figure;
+  %   plot(XTe(idxTe==1,id2),yTe(idxTe==1),'o',XTe(idxTe==2,id2),yTe(idxTe==2),'o',XTe(idxTe==3,id2),yTe(idxTe==3),'o');
+  %   figure;
+  %   plot(XTe(idxTe==1,id1),yTe(idxTe==1),'o',XTe(idxTe==2,id1),yTe(idxTe==2),'o',XTe(idxTe==3,id1),yTe(idxTe==3),'o');
+  end;
+
+  lSqTestRMSE = sqrt(2*mean(errorTe));
+  lSqTrainRMSE = sqrt(2*mean(errorTr));
+  lSqTestRMSE3 = sqrt(2*mean(errorTe3));
+  lSqTrainRMSE3 = sqrt(2*mean(errorTr3));
+  fprintf('Test RMSE:  %d\nTrain RMSE: %d\nTest RMSE3:  %d\nTrain RMSE3: %d\n',lSqTestRMSE,lSqTrainRMSE,lSqTestRMSE3,lSqTrainRMSE3);
+end;
+
+%% Ridge regression using 3 clusters
+if (strcmp(stage, 'ridgeRegCluster'))
+  disp('Ridge regression using normal equations and 3 clusters');
+  mvals = [2];
+  lvals = logspace(-2,5,10);
+  
+  id1 = 57;
+  id2 = 42;
+  [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
+  C = C(:,[1 2]);
+%   figure;
+%   plot(XTr(idxTr==1,id2),yTr(idxTr==1),'o',XTr(idxTr==2,id2),yTr(idxTr==2),'o',XTr(idxTr==3,id2),yTr(idxTr==3),'o');
+%   figure;
+%   plot(XTr(idxTr==1,id1),yTr(idxTr==1),'o',XTr(idxTr==2,id1),yTr(idxTr==2),'o',XTr(idxTr==3,id1),yTr(idxTr==3),'o');
+  idxTe = whichCluster(C, tXTe);
+
+  rmseTe = zeros(size(mvals,2), size(lvals,2));
+  rmseTr = zeros(size(mvals,2), size(lvals,2));
+  for j = 1:length(mvals)
+    m = mvals(j);
+    pXTr = myPoly(tXTr, m);
+    pXTe = myPoly(tXTe, m);
+    for l = 1:length(lvals)
+      disp('tic');
+      lambda = lvals(l);
+      b = ridgeRegression(yTr, pXTr, lambda);
+      b1 = ridgeRegression(yTr(idxTr==1), pXTr(idxTr==1,:), lambda);
+      b2 = ridgeRegression(yTr(idxTr==2), pXTr(idxTr==2,:), lambda);
+      b3 = ridgeRegression(yTr(idxTr==3), pXTr(idxTr==3,:), lambda);  
+
+      rmseTe(j,l) = sqrt(2*computeCost3Clusters(yTe, pXTe, idxTe, b1, b2, b3));
+      rmseTr(j,l) = sqrt(2*computeCost3Clusters(yTr, pXTr, idxTr, b1, b2, b3));
+      rmseTT(j,l) = sqrt(2*computeCost(yTe,pXTe,b));
+    end;
+    [rmseStar lrmseStar] = min(rmseTe(1,:));
+    [rmseTrStar lrmseTrStar] = min(rmseTr(1,:));
+    [rmseTTStar lrmseTTStar] = min(rmseTT(1,:));
+    fprintf('Test  RMSE: %d\nTrain RMSE: %d\nTT    RMSE: %d\n',rmseStar,rmseTrStar,rmseTTStar);
+ 
+    plot(lvals, rmseTe, 'b');
+    hold on;
+    plot(lvals, rmseTr, 'r');
+    set(gca,'XScale', 'log');
+    title('Error for the second degree polynom.');
+    hx = xlabel('Penalizer coefficient lambda');
+    hy = ylabel('RMSE');
+    legend('Test error', 'Training error', 'Location', 'SouthEast');
+    set(gca,'fontsize',20,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
+    set([hx; hy],'fontsize',18,'fontname','avantgarde','color',[.3 .3 .3]);
+    grid on;
+    
+    if (forReport)
+      disp('printing the figure');
+      set(gcf, 'PaperUnits', 'centimeters');
+      set(gcf, 'PaperPosition', [0 0 20 12]);
+      set(gcf, 'PaperSize', [20 12]);
+      print -dpdf 'report/figures/ridgeRegLoss.pdf'
+    end;
+  end;
 end;
 
 %% Figures for report

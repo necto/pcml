@@ -6,7 +6,7 @@ else
     forReport = false;
     %Possible values: 'leastSqGD', 'leastSq', 'removal', 'removalcor', 
     % 'dummy','ridgeReg';
-    stage = '3models';
+    stage = 'ridgeReg';
 end;
 removingOutliers = false;
 enableFullDummyCoding = false;
@@ -112,14 +112,20 @@ end;
 if (strcmp(stage, 'ridgeReg'))
   disp('Ridge regression using normal equations');
   mvals = [2];
-  lvals = logspace(1,5,20);
+  lvals = logspace(-1,5,10);
   
-  errorTe = zeros(K, 1);
-  errorTr = zeros(K, 1);
-  errorTT = zeros(K, 1);
+  id1 = 57;
+  id2 = 42;
+  [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
+  C = C(:,[1 2]);
+%   figure;
+%   plot(XTr(idxTr==1,id2),yTr(idxTr==1),'o',XTr(idxTr==2,id2),yTr(idxTr==2),'o',XTr(idxTr==3,id2),yTr(idxTr==3),'o');
+%   figure;
+%   plot(XTr(idxTr==1,id1),yTr(idxTr==1),'o',XTr(idxTr==2,id1),yTr(idxTr==2),'o',XTr(idxTr==3,id1),yTr(idxTr==3),'o');
+  idxTe = whichCluster(C, tXTe);
+
   rmseTe = zeros(size(mvals,2), size(lvals,2));
   rmseTr = zeros(size(mvals,2), size(lvals,2));
-  rmseTT = zeros(size(mvals,2), size(lvals,2));
   for j = 1:length(mvals)
     m = mvals(j);
     pXTr = myPoly(tXTr, m);
@@ -127,18 +133,14 @@ if (strcmp(stage, 'ridgeReg'))
     for l = 1:length(lvals)
       disp('tic');
       lambda = lvals(l);
-      for k = 1:K
-        [yTrTe, yTrTr, pXTrTe, pXTrTr] = split4crossValidation(k, idxCV, yTr, pXTr);
-        
-        beta = ridgeRegression(yTrTr, pXTrTr, lambda);
-        
-        errorTe(k) = computeCost(yTrTe,pXTrTe,beta);
-        errorTr(k) = computeCost(yTrTr,pXTrTr,beta);
-        errorTT(k) = computeCost(yTe,pXTe,beta);
-      end;
-      rmseTe(j,l) = sqrt(2*mean(errorTe)); 
-      rmseTr(j,l) = sqrt(2*mean(errorTr));
-      rmseTT(j,l) = sqrt(2*mean(errorTT));
+      b = ridgeRegression(yTr, pXTr, lambda);
+      b1 = ridgeRegression(yTr(idxTr==1), pXTr(idxTr==1,:), lambda);
+      b2 = ridgeRegression(yTr(idxTr==2), pXTr(idxTr==2,:), lambda);
+      b3 = ridgeRegression(yTr(idxTr==3), pXTr(idxTr==3,:), lambda);  
+
+      rmseTe(j,l) = sqrt(2*computeCost3Clusters(yTe, pXTe, idxTe, b1, b2, b3));
+      rmseTr(j,l) = sqrt(2*computeCost3Clusters(yTr, pXTr, idxTr, b1, b2, b3));
+      rmseTT(j,l) = sqrt(2*computeCost(yTe,pXTe,b));
     end;
     [rmseStar lrmseStar] = min(rmseTe(1,:));
     [rmseTrStar lrmseTrStar] = min(rmseTr(1,:));
