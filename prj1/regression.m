@@ -88,7 +88,7 @@ if (strcmp(stage, 'leastSq'))
 end;
 
 %% Split data into train and validation sets
-[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.9, 47);
+[XTr, yTr, XTe, yTe] = split(y_train, X_train, 0.9, 42);
 % Normalize data
 [XTr, XTr_mean, XTr_std] = normalize(XTr);
 XTe = adjust(XTe, XTr_mean, XTr_std);
@@ -293,10 +293,10 @@ if (strcmp(stage, 'leastSqCluster'))
 end;
 
 %% Ridge regression using 3 clusters
-if (strcmp(stage, 'ridgeRegCluster'))
+if (strcmp(stage, 'ridgeRegC luster'))
   disp('Ridge regression using normal equations and 3 clusters');
   mvals = [2];
-  lvals = logspace(0,6,10);   
+  lvals = logspace(0,6,20);   
   id1 = 57;
   id2 = 42;
   [idxTr,C] = kmeans(horzcat(XTr(:,[id1 id2]),yTr),3);
@@ -387,6 +387,8 @@ if(forReport)
   set(gcf, 'PaperSize', [20 12]);
   print -dpdf 'report/figures/CorrelationXY.pdf'
   %% 3 clouds
+  id1 = 57;
+  id2 = 42;
   XTr1 = XTr(yTr<=5500,:);
   yTr1 = yTr(yTr<=5500,:);
   XTr2 = XTr(yTr>5500 & yTr<=10000 & XTr(:,id1)>0.25 & XTr(:,id2)<6.4,:);
@@ -427,14 +429,14 @@ if (forReport && strcmp(stage, 'ridgeRegCluster'))
   disp('Do predictions');
   mvals = [2];
   lvals = logspace(0,6,20);
+  id1 = 57;id2 = 42;
   [idxTr,C] = kmeans(horzcat(XTrn(:,[id1 id2]),y_train),3);
   C = C(:,[1 2]);
 %   figure;
 %   plot(XTrn(idxTr==1,id2),y_train(idxTr==1),'o',XTrn(idxTr==2,id2),y_train(idxTr==2),'o',XTrn(idxTr==3,id2),y_train(idxTr==3),'o');
 %   figure;
 %   plot(XTrn(idxTr==1,id1),y_train(idxTr==1),'o',XTrn(idxTr==2,id1),y_train(idxTr==2),'o',XTrn(idxTr==3,id1),y_train(idxTr==3),'o');
-  assert(id1==42 && id2==57);
-  idxTe = whichCluster(C, tXtst ,id1, id2);
+  idxTe = whichCluster(C, tXtst);
 
   rmseTe = zeros(size(mvals,2), size(lvals,2));
   rmseTr = zeros(size(mvals,2), size(lvals,2));
