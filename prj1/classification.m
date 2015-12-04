@@ -2,7 +2,7 @@ if (exist('reportMode', 'var') == 1)
     forReport = true;
 else
     clear all;
-    forReport = false;
+    forReport = true;
     %Possible values: 'logReg', 'penLogReg', 'removal', 'dummy',
     %'polynomial';
     stage = 'logReg';
@@ -237,6 +237,7 @@ end;
 %% Predictions:
 
 if (forReport && strcmp(stage, 'logReg'))
+    disp('predictions');
     [XTrn, XTrn_mean, XTrn_std] = normalize(X_train);
     Xtst = adjust(X_test, XTrn_mean, XTrn_std);
     tXTrn = [ones(size(XTrn, 1), 1) XTrn];
