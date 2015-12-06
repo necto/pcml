@@ -5,5 +5,3 @@ function [ X, X_mean, X_std ] = normalize( X )
     X_std = std(X);
     X = adjust(X, X_mean, X_std);
 end
-
-/Users/Johan/Documents/repo/pcml/prj1/adjust.m
