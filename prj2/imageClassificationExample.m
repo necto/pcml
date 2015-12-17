@@ -7,8 +7,6 @@ clearvars;
 
 % Load features and labels of training data
 load train/train.mat;
-load test.mat;
-addpath(genpath('./piotr_toolbox'));
 
 %% --browse through the images and look at labels
 for i=1:10
@@ -22,7 +20,7 @@ for i=1:10
 
     title(sprintf('Label %d', train.y(i)));
 
-    pause;  % wait for key,??
+    pause;  % wait for key,? 
 end
 
 %% -- Example: split half and half into train/test, use HOG features
@@ -44,7 +42,7 @@ Te.y = train.y(Te.idxs);
 fprintf('Training simple neural network..\n');
 
 addpath(genpath('./DeepLearnToolbox'))
- 
+
 
 rng(8339);  % fix seed, this    NN may be very sensitive to initialization
 
@@ -113,5 +111,5 @@ for i=20:30  % just 10 of them, though there are thousands
     % show if it is classified as pos or neg, and true label
     title(sprintf('Label: %d, Pred: %d', train.y(Te.idxs(i)), classVote(i)));
 
-    pause;  % wait for keydo that then,??
+    pause;  % wait for keydo that then,? 
 end
