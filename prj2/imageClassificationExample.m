@@ -7,6 +7,7 @@ clearvars;
 
 % Load features and labels of training data
 load train/train.mat;
+load test.mat;
 addpath(genpath('./piotr_toolbox'));
 
 %% --browse through the images and look at labels

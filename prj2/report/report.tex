@@ -15,8 +15,9 @@
 \usepackage{natbib}
 \usepackage{color}
 \usepackage{float}
-nn\usepackage{placeins}
+\usepackage{placeins}
 \usepackage{geometry}
+\usepackage{listings}
 
 \title{Project-II by Group Istanbul}
 
@@ -48,24 +49,55 @@ EPFL \\
 
 \begin{abstract}
 In this report we describe our results for the second project of the 2015 PCML class.
-Our goal is to design a system that is able to recognize three kinds of objects present in an image.
+Our goal is to design a system that, given an image, is able to recognize three kinds of object in it.
+We tried to improve the accuracy of the system by experimenting with different methods.
 
 \end{abstract}
 
 \section{Data Description}
+
+The system we have to design has to be able to classify images based on what object they contain. 
+There are 4 classes: the image can contain an airplane, a car, a horse or neither of them.
+
+A training set containing either color or grayscale images of size 231x231 is given. It contains 6000 images, each associated with a label and two sets of features: the Histogram of Oriented Gradients (HOG) and the OverFeat ImageNet CNN Features.
+
+\paragraph{HOG feature} HOG is widely use in computer vision. 
+The basic idea is that the shape and appearance of an object is often well characterized by the distribution of local intensity gradients or edge directions \cite{hog}.
+Figure \ref{fig:image_car} and \ref{fig:hog} shows respectively an image form the training set and a visualization of its HOG feature.
+And in fact, the shape of the car is recognizable in the HOG visualization.
+
+\paragraph{CNN features} Features extracted from the OverFeat convolutional neural network (CNN).
+
+\begin{figure}[!t]
+	\centering
+	\subfigure[Training image]{\label{fig:image_car}\includegraphics[width=0.4\textwidth]{figures/train00003.jpg}}
+	\hspace{10pt}
+	\subfigure[HOG feature]{\label{fig:hog}\includegraphics[width=0.4\textwidth]{figures/hog.pdf}}
+	\caption{Visualization of the HOG feature}
+\end{figure}
+
+The testing set contains only the HOG and CNN features and not the images from which those feature are extracted.
+As a consequence we should focus on optimizing the classification based on these two set of features, and not trying to extract different one.
+The testing set contains 11'453 samples and we have to submit two predictions: a binary prediction, that is whether the image contains either a car, a plane or a horse, or neither of them and a multiclass 
+prediction, where we predict the object present in the image.
+
+\paragraph{Training data}
 
 I do not think that a horse, a car and an airplane share any common structure, so it its reasonable to do binary prediction based on the multiclass prediction. Simply:
 y = (y ~= 4)  -- if classifier have not found any of these three, answer no.
 
 Each class should be detected separately, of course:
 
+\begin{lstlisting}
+
 if (y_{horse} == 1) y = 1
 else if (y_{car} == 1) y = 2
 else if (y_{airplane} == 1) y = 3
 else y = 4
 end
+\end{lstlisting}
 
-We should think how do we handle disputed cases (e.g. y_{horse} == 1 and y_{car} == 1). we may train 3 additional classifiers for each of those (if we get enough cases for it).
+We should think how do we handle disputed cases (e.g. $y_{horse}$ == 1 and $y_{car} == 1$). we may train 3 additional classifiers for each of those (if we get enough cases for it).
 
 \section{Data visualization and basic exploratory data analysis}
 
@@ -92,5 +124,7 @@ We should think how do we handle disputed cases (e.g. y_{horse} == 1 and y_{car}
 
 
 \section{Summary}
+\bibliographystyle{plain}
+\bibliography{References.bib}
 
 \end{document}
