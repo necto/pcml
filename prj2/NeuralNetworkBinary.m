@@ -1,11 +1,11 @@
-function [ ber ] = NeuralNetwork( Tr, Te )
+function [ ber ] = NeuralNetworkBinary( Tr, Te )
 addpath(genpath('./DeepLearnToolbox'))
 
 rng(8339);  % fix seed, this    NN may be very sensitive to initialization
 
 % setup NN. The first layer needs to have number of features neurons,
 %  and the last layer the number of classes (here four).
-nn = nnsetup([size(Tr.X_cnn,2) 10 4]);
+nn = nnsetup([size(Tr.X_cnn,2) 10 2]);
 opts.numepochs =  20;   %  Number of full sweeps through data
 opts.batchsize = 100;  %  Take a mean gradient step over this many samples
 
@@ -24,10 +24,8 @@ Tr.y = Tr.y(1:numSampToUse);
 [Tr.normX, mu, sigma] = zscore(Tr.X_cnn); % train, get mu and std
 
 % prepare labels for NN
-LL = [1*(Tr.y == 1), ...
-      1*(Tr.y == 2), ...
-      1*(Tr.y == 3), ...
-      1*(Tr.y == 4) ];  % first column, p(y=1)
+LL = [1*(Tr.y == 4) , ...
+      1*(Tr.y < 4) ];  % first column, p(y=1)
                         % second column, p(y=2), etc
 
 [nn, L] = nntrain(nn, Tr.normX, LL, opts);
@@ -49,12 +47,7 @@ nnPred = nn.a{end};
 % get the most likely class
 [~,classVote] = max(nnPred,[],2);
 
-% get overall error [NOTE!! this is not the BER, you have to write the code
-%                    to compute the BER!]
-predErr = sum( classVote ~= Te.y ) / length(Te.y);
-fprintf('\nTesting error: %.2f%%', predErr * 100 );
-
-ber = BER(Te.y, classVote, 4);
+ber = BER(Te.y, classVote, 2);
 fprintf('\nBER: %.2f%\n\n', ber );
 end
 

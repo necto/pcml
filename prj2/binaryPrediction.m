@@ -11,11 +11,10 @@ load train/train.mat;
 addpath(genpath('./piotr_toolbox'));
 
 
-
 %% split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
 
-K = 5;
+K = 2;
 N = size(train.y, 1);
 idx = randperm(N);
 Nk = floor(N/K);
@@ -28,9 +27,10 @@ end;
 BERSub = zeros(K, 1);
 for k = 1:K
   [Tr, Te] = split4crossValidation(k, idxCV, train);
-  BERSub(k) = NeuralNetwork(Tr, Te); 
+  BERSub(k) = NeuralNetworkBinary(Tr, Te); 
 end
 ber = mean(BERSub);
+fprintf('\nK-fold BER(K=%d): %.2f%%\n\n', K, 100*ber );
 
 pause;
 % save('pred_binary', 'Ytest');
