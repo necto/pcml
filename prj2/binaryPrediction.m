@@ -11,11 +11,12 @@ multiclassNN = false;     % Neural network with 4 classes
 binaryNN = false;          % Neural network with 2 classes
 randomForest = true;     % Random forest
 showWrongPred = false;    % Shows images with wrong prediction
+svm = false;
 
 %% split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
-K = 2;
-N = size(train.y, 1);
+K = 3;
+N = size(train.y, 1)/10;
 idx = randperm(N);
 Nk = floor(N/K);
 idxCV = zeros(K, Nk);
@@ -26,7 +27,7 @@ end;
 %% Neural network with 2 classes
 if(binaryNN)
   BERSub = zeros(K, 1);
-  predSub = cell(K);
+  predSub = cell(K, 1);
   for k = 1:K
     [Tr, Te] = split4crossValidation(k, idxCV, train);
     [predSub{k}, BERSub(k)] = NeuralNetworkBinary(Tr, Te); 
@@ -38,7 +39,7 @@ end;
 %% Neural network with 4 classes
 if(multiclassNN)
   BERSub = zeros(K, 1);
-  predSub = cell(K);
+  predSub = cell(K, 1);
   for k = 1:K
     [Tr, Te] = split4crossValidation(k, idxCV, train);
     [predSub{k}, BERSub(k)] = NeuralNetwork(Tr, Te); 
@@ -52,13 +53,26 @@ end;
 if(randomForest)
   fprintf('\nRandom Forest\n'); 
   BERSub = zeros(K, 1);
-  predSub = cell(K);
+  predSub = cell(K, 1);
   for k = 1:K
     [Tr, Te] = split4crossValidation(k, idxCV, train);
     [predSub{k}, BERSub(k)] = RandomForest(Tr, Te); 
   end
   ber = mean(BERSub);
   fprintf('\nK-fold(K = %d) BER for Random forest: %.2f%%\n\n', K, 100*ber ); 
+end
+
+%% Support vector machine
+if(svm)
+  fprintf('\nSVM\n'); 
+  BERSub = zeros(K, 1);
+  predSub = cell(K, 1);
+  for k = 1:K
+    [Tr, Te] = split4crossValidation(k, idxCV, train);
+    [predSub{k}, BERSub(k)] = SVM(Tr, Te); 
+  end
+  ber = mean(BERSub);
+  fprintf('\nK-fold(K = %d) BER for SVM: %.2f%%\n\n', K, 100*ber ); 
 end
 
 
