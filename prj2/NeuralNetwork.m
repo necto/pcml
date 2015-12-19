@@ -49,9 +49,6 @@ nnPred = nn.a{end};
 % get the most likely class
 [~,classVote] = max(nnPred,[],2);
 
-classVote(classVote < 4) = 2;
-classVote(classVote == 4) = 1;
-
 ber = BER(Te.y, classVote, 2);
 end
 
