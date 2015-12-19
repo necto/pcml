@@ -1,4 +1,4 @@
-function [ ber ] = NeuralNetwork( Tr, Te )
+function [ classVote, ber ] = NeuralNetwork( Tr, Te )
 addpath(genpath('./DeepLearnToolbox'))
 
 rng(8339);  % fix seed, this    NN may be very sensitive to initialization
@@ -49,12 +49,9 @@ nnPred = nn.a{end};
 % get the most likely class
 [~,classVote] = max(nnPred,[],2);
 
-% get overall error [NOTE!! this is not the BER, you have to write the code
-%                    to compute the BER!]
-predErr = sum( classVote ~= Te.y ) / length(Te.y);
-fprintf('\nTesting error: %.2f%%', predErr * 100 );
+classVote(classVote < 4) = 2;
+classVote(classVote == 4) = 1;
 
-ber = BER(Te.y, classVote, 4);
-fprintf('\nBER: %.2f%\n\n', ber );
+ber = BER(Te.y, classVote, 2);
 end
 

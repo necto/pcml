@@ -1,4 +1,4 @@
-function [ ber ] = NeuralNetworkBinary( Tr, Te )
+function [ y_pred, ber ] = NeuralNetworkBinary( Tr, Te )
 addpath(genpath('./DeepLearnToolbox'))
 
 rng(8339);  % fix seed, this    NN may be very sensitive to initialization
@@ -45,9 +45,8 @@ nn.testing = 0;
 nnPred = nn.a{end};
 
 % get the most likely class
-[~,classVote] = max(nnPred,[],2);
+[~,y_pred] = max(nnPred,[],2);
 
-ber = BER(Te.y, classVote, 2);
-fprintf('\nBER: %.2f%\n\n', ber );
+ber = BER(Te.y, y_pred, 2);
 end
 
