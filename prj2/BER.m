@@ -8,10 +8,13 @@ function [ ber ] = BER( y, ypred, C )
     y(y < 4) = 2;   % contain an object in {Car,Horse,Airplane}
     y(y == 4) = 1;  % other object
   end 
+  fprintf('\nBER for class:');
   for i = 1:C
     idx = find(y==i);
     Nc = size(idx, 1);
-    ber = ber + (sum(y(idx) ~= ypred(idx)) / Nc);
+    BERClassI = (sum(y(idx) ~= ypred(idx)) / Nc);
+    ber = ber + BERClassI;
+    fprintf('\n%d: %.2f%%', i, 100*BERClassI );
   end;
   ber = ber/C;
 end
