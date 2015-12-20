@@ -11,11 +11,9 @@ function [ ber ] = BERM( y, ypred )
     
     err = zeros(C, 1);
     
-    idxpred = find(ypred==i);
-    Np = size(idxpred, 1);
-    fprintf('\n%d: %.2f%% (Nc:%d, Np:%d, A:%d, C:%d, H:%d, O:%d)', i, ...
-    100*BERClassI, Nc, Np, sum( y(idxpred) == 1), sum( y(idxpred) == 2),...
-    sum( y(idxpred) == 3),sum( y(idxpred) == 4));
+    fprintf('\n%d: %.2f%% (Nc:%d, A:%d, C:%d, H:%d, O:%d)', i, ...
+    100*BERClassI, Nc, sum( ypred(idx) == 1), sum( ypred(idx) == 2),...
+    sum( ypred(idx) == 3),sum( ypred(idx) == 4));
   end;
 
   ber = ber/C;
