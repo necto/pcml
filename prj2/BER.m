@@ -2,7 +2,7 @@ function [ ber ] = BER( y, ypred, C )
   % Compute the Balanced Error Rate (BER)
   % C = Number of classes
   ber = 0;
-  
+
   % Binary classification
   if C==2
     y(y < 4) = 2;   % contain an object in {Car,Horse,Airplane}
@@ -18,7 +18,7 @@ function [ ber ] = BER( y, ypred, C )
     Nc = size(idx, 1);
     BERClassI = (sum(y(idx) ~= ypred(idx)) / Nc);
     ber = ber + BERClassI;
-    fprintf('\n%d: %.2f%%', i, 100*BERClassI );
+    fprintf('\n%d: %.2f%% (%d)', i, 100*BERClassI, Nc );
   end;
   ber = ber/C;
 end

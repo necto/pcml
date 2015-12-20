@@ -105,6 +105,29 @@ We should think how do we handle disputed cases (e.g. $y_{horse}$ == 1 and $y_{c
 \subsection{Performance measures}
 
 \section{Predict test data}
+This section describes the different Machine Learning (ML) methods and models used to classify the images. 
+First we detail the performance measure, then the classification methods.
+
+\subsection{Cross-Validation}
+
+K-fold and Balanced Error Rate (BER) are used to measure the performance of the classification methods.
+K-fold return an unbiased estimate of the error by randomly partitioning the data into K groups, training on K-1 group and testing on the remaining one. This is done on all K sets.
+The parameter K is not easy to set for this project. 
+We want a K that split the training and testing set with a good proportion, that is there is enough data in the training set to train a neural network, SVM or a random forest while at the same time having a testing set large enough to estimate the BER.
+A problem here is that for each fold we have to train the model, which is time consuming. 
+We used a K equal to 5.
+
+\subsection{Random Forests}
+
+
+\subsection{Convolutional Neural Network}
+
+
+\subsection{SVM}
+
+
+\subsection{Combination of models}
+
 
 %\begin{figure}[!t]
 %	\centering
@@ -124,6 +147,37 @@ We should think how do we handle disputed cases (e.g. $y_{horse}$ == 1 and $y_{c
 
 
 \section{Summary}
+
+\begin{figure}[!t]
+	\centering
+	\subfigure[Car (label = 2)]{\label{fig:car_tire}\includegraphics[width=0.3\textwidth]{figures/train00368.jpg}}
+	\subfigure[Tire (label = 4)]{\label{fig:tire}\includegraphics[width=0.3\textwidth]{figures/train00942.jpg}}
+	\subfigure[Another car (label = 2)]{\label{fig:car}\includegraphics[width=0.3\textwidth]{figures/train04139.jpg}}
+	\caption{Some sample from the training set}
+\end{figure}
+
+The problem of classifying images is a hot topic on which most of the big IT companies are working on.
+Google, Tesla and probably other companies are building autonomous car, that has to be able to recognize in real-time object such as other vehicles, pedestrians, traffic lights, roadsigns...
+Thousand, even millions of images are uploaded and automatically processed in social networks every days.
+
+Recognizing an object in an image is a complex task for many reasons.
+Firstly an image has high dimension, which make the job of building, tuning and testing a model complicated.
+Secondly two very similar images can have different label.
+Take for example the images in figure \ref{fig:car_tire} and \ref{fig:tire} look similar, but they have different label. The first one is labeled as "Car" and the second fall into the "Other" categorie. Moreover the images in figure \ref{fig:car_tire} and \ref{fig:car} don't have a lot in common, but they are both labeled as car.
+Sometimes the object is cropped: only a part of it appear in the image. The object can be hidden by another object, or several objects are appearing in the same image, which make it difficult to distinguish the one we are interested in.
+
+For this project the ML methods we can try are limited. The code submitted has to reproduce the results and cannot be larger than 20MB. So we cannot experiment with various toolboxes without violating this limit.
+And for the testing set only the HOG and CNN features are provided, not the original images which has for consequence that we cannot extract other features ourselves but have to work only with these two.
+
+
+
+
+
+
+
+
+
+
 \bibliographystyle{plain}
 \bibliography{References.bib}
 
