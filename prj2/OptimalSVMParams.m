@@ -22,7 +22,7 @@ function [optimalKernelScale, optimalBoxConstraint, optimalBias] = ...
         optimalKernelScale = 100;
         optimalBoxConstraint = 2.6367;
         if (useNegs)
-            optimalBias = 19.9526;
+            optimalBias = 15.8489;
         else
             optimalBias = 7.017;
         end

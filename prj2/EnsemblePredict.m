@@ -9,15 +9,25 @@ function [ Prediction, Confidence ] = EnsemblePredict( data )
 PredictionAll = [SVMPrediction NNPrediction RFPrediction];
 ConfidenceAll = [SVMConfidence NNConfidence RFConfidence];
 
-[~, ConfidenceIdx] = max(ConfidenceAll, [], 2);
+Prediction = zeros(size(PredictionAll, 1), 1);
+Confidence = zeros(size(ConfidenceAll, 1), 1);
+classes = unique(PredictionsAll);
 
-fprintf('used %d SVM, %d NN and %d RF predictions\n', ...
-        length(find(ConfidenceIdx == 1)), ...
-        length(find(ConfidenceIdx == 2)), ...
-        length(find(ConfidenceIdx == 3)));
+byMajority = 0;
+byConfidence = 0;
 
-Prediction = PredictionAll(sub2ind(size(PredictionAll), ...
-                           1:length(ConfidenceIdx), ConfidenceIdx'))';
-Confidence = ConfidenceAll(sub2ind(size(ConfidenceAll), ...
-                           1:length(ConfidenceIdx), ConfidenceIdx'))';
+for i = 1:size(PredictionsAll, 1)
+    hasMajority = any(histc(PredictionsAll(i), classes) > 1);
+    if (hasMajority)
+        Prediction(i) = mode(PredictionsAll(i));
+        Confidence(i) = max(ConfidenceAll(i, PredictionAll == Prediction(i)));
+        byMajority = byMajority + 1;
+    else
+        [Confidence(i), idConf] = max(ConfidenceAll(i));
+        Prediction(i) = PredictionAll(idConf);
+        byConfidence = byConfidence + 1;
+    end
+end
+
+fprintf('by majority: %d; by confidency: %d\n', byMajority, byConfidence);
 end
