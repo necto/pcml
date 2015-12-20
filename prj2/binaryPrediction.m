@@ -13,9 +13,9 @@ Horse = 3;
 Other = 4;
 
 %% Set which method to run
-multiclassNN = false;     % Neural network with 4 classes
+multiclassNN = true;     % Neural network with 4 classes
 binaryNN = false;          % Neural network with 2 classes
-randomForest = true;     % Random forest
+randomForest = false;     % Random forest
 showWrongPred = false;    % Shows images with wrong prediction
 svm = false;
 rF = false;
