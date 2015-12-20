@@ -11,15 +11,15 @@ ConfidenceAll = [SVMConfidence NNConfidence RFConfidence];
 
 Prediction = zeros(size(PredictionAll, 1), 1);
 Confidence = zeros(size(ConfidenceAll, 1), 1);
-classes = unique(PredictionsAll);
+classes = unique(PredictionAll);
 
 byMajority = 0;
 byConfidence = 0;
 
-for i = 1:size(PredictionsAll, 1)
-    hasMajority = any(histc(PredictionsAll(i), classes) > 1);
+for i = 1:size(PredictionAll, 1)
+    hasMajority = any(histc(PredictionAll(i), classes) > 1);
     if (hasMajority)
-        Prediction(i) = mode(PredictionsAll(i));
+        Prediction(i) = mode(PredictionAll(i));
         Confidence(i) = max(ConfidenceAll(i, PredictionAll == Prediction(i)));
         byMajority = byMajority + 1;
     else
@@ -29,5 +29,5 @@ for i = 1:size(PredictionsAll, 1)
     end
 end
 
-fprintf('by majority: %d; by confidency: %d\n', byMajority, byConfidence);
+fprintf('by majority: %d; by confidence: %d\n', byMajority, byConfidence);
 end
