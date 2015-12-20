@@ -1,6 +1,6 @@
-clearvars;
-close all;
-load train/train.mat;
+function [ Prediction, Confidence ] = EnsemblePredict( train )
+%EnsemblePredict Summary of this function goes here
+%   Detailed explanation goes here
 
 [SVMPrediction, SVMConfidence] = SVMPredict(train);
 [NNPrediction, NNConfidence] = NNPredict(train);
@@ -13,5 +13,6 @@ ConfidenceAll = zscore([SVMConfidence NNConfidence RFConfidence]);
 
 Prediction = PredictionAll(sub2ind(size(PredictionAll), ...
                            1:length(ConfidenceIdx), ConfidenceIdx'));
+end
 
                        
