@@ -173,7 +173,7 @@ end
 
 if(trainModels)
   fprintf('\nOutput models\n');  
-  %outputNNModel(train);
+  outputNNModel(train);
   outputRFModel(train);
 end
 
