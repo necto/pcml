@@ -1,7 +1,4 @@
-function [ hog_negs1 hog_negs2 hog_negs3 ] = mineNegativeFeatures(Model1, Model2, Model3, otherClass)
-    addpath(genpath('./piotr_toolbox'));
-    load train/train.mat;
-    
+function [ hog_negs1 hog_negs2 hog_negs3 ] = mineNegativeFeatures(Model1, Model2, Model3, otherClass, train)
     other_class = find(train.y == 4);
     
     slide_step = 7;

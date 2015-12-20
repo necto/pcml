@@ -6,7 +6,7 @@ close all;
 load train/train.mat;
 
 
-positiveClass = 3;
+positiveClass = 2;
 useNegs = false;
 
 negs = [];
@@ -35,7 +35,7 @@ end
 %% Prepare the data
 % split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
-K = 3;
+K = 2;
 N = size(train.y, 1);
 idx = randperm(N);
 Nk = floor(N/K);
