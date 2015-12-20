@@ -13,10 +13,14 @@ function [ Prediction, Confidence ] = SVMPredict( data )
     [p2, c2] = predict(svmC2, data);
     [p3, c3] = predict(svmC3, data);
     
-    Prediction = zeros(size(data, 1), 1) + 4; % Class 'other' by default
-    Confidence = zeros(size(data, 1), 1); % no confidence by default
-
-    [~, Prediction] = max([c1 c2 c3], p3
+    ConfidenceAll = [c1 c2 c3];
     
-end
+    Prediction = zeros(size(data, 1), 1) + 4; % Class 'other' by default
 
+    [Confidence, Idx] = max(ConfidenceAll, [], 2);
+    negativeClass = (rem(Idx, 2) == 0);
+    positiveClass = Idx/2;
+    
+    Prediction(negativeClass) = 4;
+    Prediction(~negativeClass) = positiveClass(~negativeClass);
+end
