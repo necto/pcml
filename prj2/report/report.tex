@@ -63,11 +63,11 @@ A training set containing either color or grayscale images of size 231x231 is gi
 
 For acceleration of the experiments, we considered the ways to reduce the number of features. 
 
-One ways is to scale down the input images. However, this affectts only the HOG features, as CNN represents the neural network weights and does not depend on the number of pixels in the image.
+One ways is to scale down the input images. However, this affects only the HOG features, as CNN represents the neural network weights and does not depend on the number of pixels in the image.
 
 The CNN feature array seems very sparse. However an investigation shown that each feature(except for the last one) is nonzero for at least 20 images in the train set.
 
-Other way is to find correlations in that matrix. no way: number of features ~36000, number of datapoints 6000 -> matrix rank is going to be <= 6000 => there are a lot of linear combinations of the columns.
+Other way is to find correlations in that matrix. no way: number of features ~36000, number of data-points 6000 -> matrix rank is going to be <= 6000 => there are a lot of linear combinations of the columns.
 
 Note: move from small-pics to the originals require a complete recalibration of SVM meta-parameters
 

@@ -5,10 +5,8 @@ function [ ber ] = BER( y, ypred, C )
 
   % Binary classification
   if C==2
-    if(length(unique(ypred(:))) == 4)
-        y(y < 4) = 2;   % contain an object in {Car,Horse,Airplane}
-        y(y == 4) = 1;  % other object
-    end
+    y(y < 4) = 2;   % contain an object in {Car,Horse,Airplane}
+    y(y == 4) = 1;  % other object
     if(length(unique(ypred(:))) == 4)
       ypred(ypred < 4) = 2;
       ypred(ypred == 4) = 1;

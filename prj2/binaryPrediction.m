@@ -15,10 +15,10 @@ Other = 4;
 %% Set which method to run
 multiclassNN = false;     % Neural network with 4 classes
 binaryNN = false;          % Neural network with 2 classes
-randomForest = false;     % Random forest
+randomForest = true;     % Random forest
 showWrongPred = false;    % Shows images with wrong prediction
 svm = false;
-rF = true;
+rF = false;
 
 %% split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
