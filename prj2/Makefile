@@ -10,7 +10,7 @@ train/small_imgs:
 train/small_imgs/%.jpg : train/imgs/%.jpg train/small_imgs
 	convert $< -resize 25% $@
 
-train/small.mat: $(small_images_list)
+train/small.mat: small_train_features.m $(small_images_list)
 	matlab -nodesktop -nosplash -nodisplay -r 'small_train_features;quit;'
 
 
