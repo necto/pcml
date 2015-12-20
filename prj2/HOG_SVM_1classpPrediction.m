@@ -76,7 +76,7 @@ if (produce_model)
     toc
     
     train_labels = (train.y == positiveClass)*2 - 1;
-    fprintf('Creating a model on the full train dataset');
+    fprintf('Creating a model on the full train dataset\n');
     SVMModel = fitcsvm([train.X_hog; negs], [train_labels; negLabels], ...
                        'KernelFunction', 'rbf', 'KernelScale', ks, ...
                        'BoxConstraint', bc, 'Cost', [0 1; bias 0] );

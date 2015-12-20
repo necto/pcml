@@ -220,7 +220,24 @@ Hard-negation mining.
 
 Optimal parameter choice
 
+we choose parameters with manual coordinate descent using cross validation.
+
+\begin{table}
+  \centering
+  \begin{tabuler}{l|l|l}
+    \hline
+    Class & CV BER & CV BER with additional negative samples \\ \hline
+    Airplane &     & \\
+    Car &          & \\
+    Horse &        & \\ \hline
+  \end{tabuler}
+  \caption{Prediction error for each class for SVM with and without hard-negative mined samples}
+  \label{tbl:SVMerr}
+\end{table}
+
 \subsection{Ensemble classifier}
+
+highest confidence
 
 
 %\begin{figure}[!t]

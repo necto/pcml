@@ -7,9 +7,9 @@ function [optimalKernelScale, optimalBoxConstraint, optimalBias] = ...
         optimalBoxConstraint = 2.3713;
         optimalBias = 3.1623;
     elseif (positiveClass == 2)
-        optimalKernelScale = 107.9775;
+        optimalKernelScale = 84.8343;
         optimalBoxConstraint = 1.3895;
-        optimalBias = 4.6416;
+        optimalBias = 4.5409;
     elseif (positiveClass == 3)
         optimalKernelScale = 100;
         optimalBoxConstraint = 2.6367;
