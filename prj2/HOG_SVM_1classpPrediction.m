@@ -28,31 +28,15 @@ if (useNegs)
     [negs, ~, ~] = zscore(negs);
 end
 
-if (positiveClass == 1)
-    optimalKernelScale = 233.5721;
-    optimalBoxConstraint = 2.6367;
-    optimalBias = 2.6827;
-elseif (positiveClass == 2)
-    optimalKernelScale = 112.8838;
-    optimalBoxConstraint = 1.3539;
-    optimalBias = 4.6416;
-elseif (positiveClass == 3)
-    optimalKernelScale = 100;
-    optimalBoxConstraint = 2.6367;
-    if (useNegs)
-        optimalBias = 19.9526;
-    else
-        optimalBias = 7.017;
-    end
-else
-    fprintf('wrong positive class: %d\n', positiveClass);
-end
+[optimalKernelScale, optimalBoxConstraint, optimalBias] = ...
+    OptimalSVMParams(positiveClass, useNegs);
+
 
 %% Prepare the data
 % split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
-K = 3;
-N = size(train.y, 1)/10;
+K = 2;
+N = size(train.y, 1);
 idx = randperm(N);
 Nk = floor(N/K);
 idxCV = zeros(K, Nk);
@@ -64,9 +48,9 @@ end;
 [train.X_hog, mu, sigma] = zscore(train.X_hog);
 
 %% HOG SVM prediction
-produce_predictions = false;
-if (produce_predictions)
-    fprintf('producing predictions\n');
+produce_model = true;
+if (produce_model)
+    fprintf('producing model for class %d\n', positiveClass);
     tic
     TeBERSub = zeros(K, 1);
     TrBERSub = zeros(K, 1);
@@ -77,7 +61,9 @@ if (produce_predictions)
         [Tr, Te] = split4crossValidation(k, idxCV, train);
         Tr_labels = (Tr.y == positiveClass)*2 - 1;
         Te_labels = (Te.y == positiveClass)*2 - 1;
-        SVMModel = fitcsvm([Tr.X_hog; negs], [Tr_labels; negLabels], 'KernelFunction', 'rbf', 'KernelScale', ks, 'BoxConstraint', bc, 'Cost', [0 1; bias 0] );
+        SVMModel = fitcsvm([Tr.X_hog; negs], [Tr_labels; negLabels], ...
+                           'KernelFunction', 'rbf', 'KernelScale', ks, ...
+                           'BoxConstraint', bc, 'Cost', [0 1; bias 0] );
         [predTe, scoreTe] = predict(SVMModel, Te.X_hog);
         [predTr, scoreTr] = predict(SVMModel, Tr.X_hog);
         TeBERSub(k) = BER(Te_labels, predTe, 2);
@@ -85,8 +71,19 @@ if (produce_predictions)
     end
     berTe = mean(TeBERSub);
     berTr = mean(TrBERSub);
+    stdTe = std(TeBERSub);
+    stdTr = std(TrBERSub);
     toc
-    display(berTe);
+    
+    train_labels = (train.y == positiveClass)*2 - 1;
+    fprintf('Creating a model on the full train dataset\n');
+    SVMModel = fitcsvm([train.X_hog; negs], [train_labels; negLabels], ...
+                       'KernelFunction', 'rbf', 'KernelScale', ks, ...
+                       'BoxConstraint', bc, 'Cost', [0 1; bias 0] );
+    modelFileName = sprintf('models/svmC%d.mat', positiveClass);
+    save(modelFileName, 'SVMModel');
+    fprintf('test BER: %d (std %d), train BER: %d (std %d)', ...
+            berTe, stdTe, berTr, stdTr);
 end
 
 optimizing_biases = false;

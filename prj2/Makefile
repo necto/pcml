@@ -13,13 +13,22 @@ istanbul.zip: report/report.pdf pred_binary.mat pred_multiclass.mat code/last_up
 	zip -r -j istanbul.zip submission
 	rm -r submission
 
+code/last_updated: Makefile *.m
+	cp Makefile code/
+	cp *.m code/
+	touch code/last_updated
+
 report/report.pdf: report/report.tex report/*.tex report/*.bib report/figures/*
 	cd report && pdflatex report.tex && pdflatex report.tex
 
 small_images: $(small_images_list)
 
-train/negs3.mat train/negs2.mat train/negs1.mat: train
+train/negs3.mat train/negs2.mat train/negs1.mat: train models/svmC1.mat models/svmC2.mat models/svmC3.mat
 	matlab -nodesktop -nosplash -nodisplay -r 'hardNegativeMining;quit;'
+
+test/test.mat:
+	mkdir -p test
+	wget "http://cvlabwww.epfl.ch/~cjbecker/tmp/test.mat" -O test/test.mat
 
 train:
 	wget "http://cvlabwww.epfl.ch/~cjbecker/pcml_project2/train.tar.gz"
