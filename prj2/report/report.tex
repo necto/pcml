@@ -167,7 +167,8 @@ In the example, this NN is trained on the HOG features and give a BER of 29.32\%
 
 We tried to train the NN with the CNN features and the same configuration, and this time the BER is 12.73\%.
 The next step is trying to find optimal values for the parameters with a grid search. As the NN takes quite a long time to train, we cannot afford to do a grid search with too many parameters.
-Here we 
+We obtain the best performance with a learning rate = 3, number of epoch = 90 and batch size = 200. 
+The BER is 11.24\%.
 
 
 \subsection{Random Forests}

@@ -6,13 +6,13 @@ rng(8339);  % fix seed, this    NN may be very sensitive to initialization
 % setup NN. The first layer needs to have number of features neurons,
 %  and the last layer the number of classes (here four).
 nn = nnsetup([size(Tr.X_cnn,2) 10 4]);
-opts.numepochs =  20;   %  Number of full sweeps through data
-opts.batchsize = 100;  %  Take a mean gradient step over this many samples
+opts.numepochs =  90;   %  Number of full sweeps through data
+opts.batchsize = 200;  %  Take a mean gradient step over this many samples
 
 % if == 1 => plots trainin error as the NN is trained
 opts.plot               = 0;
 
-nn.learningRate = 2;
+nn.learningRate = 3;
 
 % this neural network implementation requires number of samples to be a
 % multiple of batchsize, so we remove some for this to be true.
@@ -41,7 +41,6 @@ Te.normX = normalize(Te.X_cnn, mu, sigma);  % normalize test data
 nn.testing = 1;
 nn = nnff(nn, Te.normX, zeros(size(Te.normX,1), nn.size(end)));
 nn.testing = 0;
-
 
 % predict on the test set
 nnPred = nn.a{end};
