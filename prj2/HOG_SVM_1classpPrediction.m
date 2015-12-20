@@ -6,8 +6,8 @@ close all;
 load train/train.mat;
 
 
-positiveClass = 3;
-useNegs = true;
+positiveClass = 2;
+useNegs = false;
 
 negs = [];
 negLabels = [];
@@ -29,13 +29,13 @@ if (useNegs)
 end
 
 if (positiveClass == 1)
-    optimalKernelScale = 100;
+    optimalKernelScale = 233.5721;
     optimalBoxConstraint = 2.6367;
-    optimalBias = 7.017;
+    optimalBias = 2.6827;
 elseif (positiveClass == 2)
-    optimalKernelScale = 100;
-    optimalBoxConstraint = 2.6367;
-    optimalBias = 7.017;
+    optimalKernelScale = 112.8838;
+    optimalBoxConstraint = 1.3539;
+    optimalBias = 4.6416;
 elseif (positiveClass == 3)
     optimalKernelScale = 100;
     optimalBoxConstraint = 2.6367;
@@ -52,7 +52,7 @@ end
 % split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
 K = 3;
-N = size(train.y, 1);
+N = size(train.y, 1)/10;
 idx = randperm(N);
 Nk = floor(N/K);
 idxCV = zeros(K, Nk);
@@ -102,7 +102,7 @@ if(optimizing_biases)
         TeBERSub = zeros(K, 1);
         TrBERSub = zeros(K, 1);
         predSub = cell(K);
-        parfor k = 1:K
+        for k = 1:K
             [Tr, Te] = split4crossValidation(k, idxCV, train);
             Tr_labels = (Tr.y == positiveClass)*2 - 1;
             Te_labels = (Te.y == positiveClass)*2 - 1;
@@ -125,10 +125,10 @@ optimize_box_constraint = false;
 if (optimize_box_constraint)
     fprintf('optimizeing box constraint\n');
     rng(1) % platform dependent!!
-    box_constraints = logspace(-1, 1, 20);
+    box_constraints = logspace(-0.5, 1, 20);
     bers = zeros(length(box_constraints), 1);
-    ks = 100;
-    bias = 7.0170;
+    ks = optimalKernelScale;
+    bias = optimalBias;
     for bci = 1:length(box_constraints)
         bc = box_constraints(bci);
         TeBERSub = zeros(K, 1);
@@ -153,7 +153,7 @@ if (optimize_box_constraint)
     semilogx(box_constraints,berTr);
 end
 
-optimize_kernel_scale = true;
+optimize_kernel_scale = false;
 if (optimize_kernel_scale)
     fprintf('optimizing kernel scale\n');
     rng(1) % platform dependent!!
@@ -162,9 +162,9 @@ if (optimize_kernel_scale)
         ks = kernel_scales(ksi);
         TeBERSub = zeros(K, 1);
         TrBERSub = zeros(K, 1);
-        bc = 2.6367;
-        bias = 7.017;
-        parfor k = 1:K
+        bc = optimalBoxConstraint;
+        bias = optimalBias;
+        for k = 1:K
             [Tr, Te] = split4crossValidation(k, idxCV, train);
             Tr_labels = (Tr.y == positiveClass)*2 - 1;
             Te_labels = (Te.y == positiveClass)*2 - 1;
