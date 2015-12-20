@@ -25,6 +25,7 @@ if (useNegs)
         fprintf('wrong positive class: %d\n', positiveClass);
     end
     negLabels = zeros(size(negs, 1), 1) - 1;
+    [negs, ~, ~] = zscore(negs);
 end
 
 if (positiveClass == 1)
@@ -38,7 +39,11 @@ elseif (positiveClass == 2)
 elseif (positiveClass == 3)
     optimalKernelScale = 100;
     optimalBoxConstraint = 2.6367;
-    optimalBias = 7.017;
+    if (useNegs)
+        optimalBias = 19.9526;
+    else
+        optimalBias = 7.017;
+    end
 else
     fprintf('wrong positive class: %d\n', positiveClass);
 end
@@ -84,11 +89,11 @@ if (produce_predictions)
     display(berTe);
 end
 
-optimizing_biases = true;
+optimizing_biases = false;
 if(optimizing_biases)
     fprintf('optimizing bias\n');
     rng(1) % platform dependent!!
-    biases = logspace(0.2, 1.9, 6);
+    biases = logspace(1, 1.5, 6);
     bers = zeros(length(biases), 1);
     ks = optimalKernelScale;
     bc = optimalBoxConstraint;
@@ -150,17 +155,16 @@ end
 
 optimize_kernel_scale = true;
 if (optimize_kernel_scale)
-    printf('optimizing kernel scale\n');
+    fprintf('optimizing kernel scale\n');
     rng(1) % platform dependent!!
-    kernel_scales = logspace(1, 3, 10);
+    kernel_scales = logspace(1.5, 2.5, 5);
     for ksi = 1:length(kernel_scales)
         ks = kernel_scales(ksi);
         TeBERSub = zeros(K, 1);
         TrBERSub = zeros(K, 1);
-        %ks = 100;
         bc = 2.6367;
         bias = 7.017;
-        for k = 1:K
+        parfor k = 1:K
             [Tr, Te] = split4crossValidation(k, idxCV, train);
             Tr_labels = (Tr.y == positiveClass)*2 - 1;
             Te_labels = (Te.y == positiveClass)*2 - 1;

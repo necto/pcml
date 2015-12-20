@@ -18,7 +18,7 @@ report/report.pdf: report/report.tex report/*.tex report/*.bib report/figures/*
 
 small_images: $(small_images_list)
 
-train/negs3.mat: train
+train/negs3.mat train/negs2.mat train/negs1.mat: train
 	matlab -nodesktop -nosplash -nodisplay -r 'hardNegativeMining;quit;'
 
 train:
