@@ -1,37 +1,39 @@
-clearvars;
-close all;
-% Load features and labels of training data
-%load train/small.mat;
-%train = small;
-load train/train.mat
-% Load features of testing data
-% load test.mat;
-%addpath(genpath('./piotr_toolbox'));
-
-%% Prepare the data
-% split randomly into train/test, use K-fold
-fprintf('Splitting into train/test..\n');
-K = 3;
-N = size(train.y, 1);
-idx = randperm(N);
-Nk = floor(N/K);
-idxCV = zeros(K, Nk);
-for k = 1:K
-    idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
-end;
-
-% Normalize the data
-[train.X_hog, mu, sigma] = zscore(train.X_hog);
-
-%% HOG SVM prediction
 if (true)
-        tic
+    clearvars;
+    close all;
+    % Load features and labels of training data
+    %load train/small.mat;
+    %train = small;
+    load train/train.mat
+    % Load features of testing data
+    % load test.mat;
+    %addpath(genpath('./piotr_toolbox'));
+
+    %% Prepare the data
+    % split randomly into train/test, use K-fold
+    fprintf('Splitting into train/test..\n');
+    K = 2;
+    N = size(train.y, 1);
+    idx = randperm(N);
+    Nk = floor(N/K);
+    idxCV = zeros(K, Nk);
+    for k = 1:K
+        idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
+    end;
+
+    % Normalize and reduce the data
+    [train.X_hog, mu, sigma] = zscore(reshape(mean(mean(reshape(train.X_hog, 6000, 13, 13, 32), 2), 3), 6000, 32));
+
+end
+
+%% SVM prediction
+if (true)
         TeBERSub = zeros(K, 1);
         TrBERSub = zeros(K, 1);
-        ks = 100;
-        bc = 2.6367;
-        bias = 7.017;
-        parfor k = 1:K
+        ks = 2.3357;
+        bc = 2.1544;
+        bias = 8.862;
+        for k = 1:K
             [Tr, Te] = split4crossValidation(k, idxCV, train);
             Tr_horses = (Tr.y == 3);
             Tr_horses = Tr_horses*2 - 1;
@@ -46,20 +48,19 @@ if (true)
             predTr(predTr == -1) = 2;
             TeBERSub(k) = BER(Te_horses, predTe, 2);
             TrBERSub(k) = BER(Tr_horses, predTr, 2);
-        end
-        berTe = mean(TeBERSub);
-        berTr = mean(TrBERSub);
-        toc
-        display(berTe);
+          end
+          berTe = mean(TeBERSub);
+          berTr = mean(TrBERSub);
 end
 
 optimizing_biases = false;
 if(optimizing_biases)
     rng(1) % platform dependent!!
     biases = logspace(-1, 3, 40);
-    bers = zeros(length(biases), 1);
-    ks = 100;
-    bc = 2.6367;
+    berTe = zeros(length(biases), 1);
+    berTr = zeros(length(biases), 1);
+    ks = 2.3357;
+    bc = 2.1544;
     for biasi = 1:length(biases)
         bias = biases(biasi);
         TeBERSub = zeros(K, 1);
@@ -93,9 +94,9 @@ end
 optimize_box_constraints = false;
 if (optimize_box_constraints)
     rng(1) % platform dependent!!
-    box_constraints = logspace(-1, 1, 20);
+    box_constraints = logspace(-1, 3, 40);
     bers = zeros(length(box_constraints), 1);
-    ks = 100;
+    ks = 2.3357;
     bias = 7.0170;
     for bci = 1:length(box_constraints)
         bc = box_constraints(bci);
@@ -127,16 +128,15 @@ if (optimize_box_constraints)
     semilogx(box_constraints,berTr);
 end
 
-plot_kernel_scale_dependency = false;
-if (plot_kernel_scale_dependency) 
+if(false)
     rng(1) % platform dependent!!
-    kernel_scales = logspace(1, 3, 10);
+    kernel_scales = logspace(-1, 1, 20);
     for ksi = 1:length(kernel_scales)
         ks = kernel_scales(ksi);
         TeBERSub = zeros(K, 1);
         TrBERSub = zeros(K, 1);
-        %ks = 100;
-        bc = 2.6367;
+        %ks = 2.3357;
+        bc = 2.1544;
         bias = 7.017;
         for k = 1:K
             [Tr, Te] = split4crossValidation(k, idxCV, train);

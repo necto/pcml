@@ -4,7 +4,11 @@ small_images_list=$(subst imgs,small_imgs,$(images_list))
 
 small_images: $(small_images_list)
 
-train/small_imgs:
+train:
+	wget "http://cvlabwww.epfl.ch/~cjbecker/pcml_project2/train.tar.gz"
+	tar -xvzf train.tar.gz
+
+train/small_imgs: train
 	mkdir -p train/small_imgs
 
 train/small_imgs/%.jpg : train/imgs/%.jpg train/small_imgs
