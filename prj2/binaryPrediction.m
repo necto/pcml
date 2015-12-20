@@ -20,12 +20,13 @@ pO = sum(train.y==Other)/totalNbrTrainingSamples;
 prior = [pA, pC, pH, pO];
 
 %% Set which method to run
-multiclassNN = true;     % Neural network with 4 classes
+multiclassNN = false;     % Neural network with 4 classes
 binaryNN = false;          % Neural network with 2 classes
 randomForest = false;     % Random forest
 showWrongPred = false;    % Shows images with wrong prediction
 svm = false;
 rF = false;
+trainModels = true;
 
 %% Correct imbalance between classes
 minNbr = 964;
@@ -100,7 +101,7 @@ if(randomForest)
   predSub = cell(K, 1);
   for k = 1:K
     [Tr, Te] = split4crossValidation(k, idxCV, train);
-    [predSub{k}, BERSub(k)] = RandomForest(Tr, Te, prior); 
+    [predSub{k}, BERSub(k)] = RandomForest(Tr, Te ); 
   end
   ber = mean(BERSub);
   fprintf('\nK-fold(K = %d) BER for Random forest: %.2f%%\n\n', K, 100*ber ); 
@@ -166,5 +167,8 @@ if(rF)
   
 end
 
+if(trainModels)
+  
+end
 %% Save results
 % save('pred_binary', 'Ytest');

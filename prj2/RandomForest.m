@@ -1,4 +1,4 @@
-function [ y_pred, ber ] = RandomForest( Tr, Te, prior )
+function [ y_pred, ber ] = RandomForest( Tr, Te )
 % Classificatio using a random forest
   NumTrees = 300;
   B = TreeBagger(NumTrees, Tr.X_cnn, Tr.y, 'OOBPred','On');
