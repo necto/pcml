@@ -7,10 +7,17 @@ load train/train.mat;
 addpath(genpath('./piotr_toolbox'));
 
 % Classes
-Airplane = 1;
+Airplane = 1; 
 Car = 2;
 Horse = 3;
 Other = 4;
+% Prior probabilities for each class
+totalNbrTrainingSamples = length(train.y);
+pA = sum(train.y==Airplane)/totalNbrTrainingSamples;
+pC = sum(train.y==Car)/totalNbrTrainingSamples;
+pH = sum(train.y==Horse)/totalNbrTrainingSamples;
+pO = sum(train.y==Other)/totalNbrTrainingSamples;
+prior = [pA, pC, pH, pO];
 
 %% Set which method to run
 multiclassNN = true;     % Neural network with 4 classes
@@ -19,6 +26,36 @@ randomForest = false;     % Random forest
 showWrongPred = false;    % Shows images with wrong prediction
 svm = false;
 rF = false;
+
+%% Correct imbalance between classes
+minNbr = 964;
+% Pick randomly 964 samples per class
+idx1 = find(train.y==1);
+perm = randperm(length(idx1));
+idx1 = idx1(perm);
+idx2 = find(train.y==2);
+perm = randperm(length(idx2));
+idx2 = idx2(perm);
+idx2 = idx2(1:minNbr);
+idx3 = find(train.y==3);
+perm = randperm(length(idx3));
+idx3 = idx3(perm);
+idx3 = idx3(1:minNbr);
+idx4 = find(train.y==4);
+perm = randperm(length(idx4));
+idx4 = idx4(perm);
+idx4 = idx4(1:minNbr);
+
+idxTr = vertcat(idx1, idx2, idx3, idx4);
+perm = randperm(length(idxTr));
+idxTr = idxTr(perm);
+
+train.X_hog = train.X_hog(idxTr,:);
+train.X_cnn = train.X_cnn(idxTr,:);
+train.y = train.y(idxTr);
+
+% Build new training set
+
 
 %% split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
@@ -63,7 +100,7 @@ if(randomForest)
   predSub = cell(K, 1);
   for k = 1:K
     [Tr, Te] = split4crossValidation(k, idxCV, train);
-    [predSub{k}, BERSub(k)] = RandomForest(Tr, Te); 
+    [predSub{k}, BERSub(k)] = RandomForest(Tr, Te, prior); 
   end
   ber = mean(BERSub);
   fprintf('\nK-fold(K = %d) BER for Random forest: %.2f%%\n\n', K, 100*ber ); 
