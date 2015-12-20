@@ -6,7 +6,7 @@ close all;
 load train/train.mat;
 
 
-positiveClass = 1;
+positiveClass = 2;
 useNegs = false;
 
 negs = [];
@@ -32,9 +32,9 @@ if (positiveClass == 1)
     optimalBoxConstraint = 2.6367;
     optimalBias = 2.6827;
 elseif (positiveClass == 2)
-    optimalKernelScale = 100;
-    optimalBoxConstraint = 2.6367;
-    optimalBias = 7.017;
+    optimalKernelScale = 112.8838;
+    optimalBoxConstraint = 1.3539;
+    optimalBias = 4.6416;
 elseif (positiveClass == 3)
     optimalKernelScale = 100;
     optimalBoxConstraint = 2.6367;
@@ -88,7 +88,7 @@ optimizing_biases = true;
 if(optimizing_biases)
     fprintf('optimizing bias\n');
     rng(1) % platform dependent!!
-    biases = logspace(0, 2, 15);
+    biases = logspace(-0.5, 1.5, 25);
     bers = zeros(length(biases), 1);
     ks = optimalKernelScale;
     bc = optimalBoxConstraint;
@@ -116,11 +116,11 @@ if(optimizing_biases)
     semilogx(biases,berTr);
 end
 
-optimize_box_constraint = true;
+optimize_box_constraint = false;
 if (optimize_box_constraint)
     fprintf('optimizeing box constraint\n');
     rng(1) % platform dependent!!
-    box_constraints = logspace(-1, 2, 10);
+    box_constraints = logspace(-0.5, 1, 20);
     bers = zeros(length(box_constraints), 1);
     ks = optimalKernelScale;
     bias = optimalBias;
@@ -152,7 +152,7 @@ optimize_kernel_scale = false;
 if (optimize_kernel_scale)
     fprintf('optimizing kernel scale\n');
     rng(1) % platform dependent!!
-    kernel_scales = logspace(2, 3, 20);
+    kernel_scales = logspace(1, 3, 20);
     for ksi = 1:length(kernel_scales)
         ks = kernel_scales(ksi);
         TeBERSub = zeros(K, 1);
