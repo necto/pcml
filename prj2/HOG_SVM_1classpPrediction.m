@@ -25,12 +25,13 @@ end;
 
 %% HOG SVM prediction
 if (true)
+        tic
         TeBERSub = zeros(K, 1);
         TrBERSub = zeros(K, 1);
         ks = 100;
         bc = 2.6367;
         bias = 7.017;
-        for k = 1:K
+        parfor k = 1:K
             [Tr, Te] = split4crossValidation(k, idxCV, train);
             Tr_horses = (Tr.y == 3);
             Tr_horses = Tr_horses*2 - 1;
@@ -45,9 +46,11 @@ if (true)
             predTr(predTr == -1) = 2;
             TeBERSub(k) = BER(Te_horses, predTe, 2);
             TrBERSub(k) = BER(Tr_horses, predTr, 2);
-          end
-          berTe = mean(TeBERSub);
-          berTr = mean(TrBERSub);
+        end
+        berTe = mean(TeBERSub);
+        berTr = mean(TrBERSub);
+        toc
+        display(berTe);
 end
 
 optimizing_biases = false;
