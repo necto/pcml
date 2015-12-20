@@ -20,7 +20,7 @@ function [ ber ] = BER( y, ypred, C )
     Nc = size(idx, 1);
     BERClassI = (sum(y(idx) ~= ypred(idx)) / Nc);
     ber = ber + BERClassI;
-    fprintf('\n%d: %.2f%%', i, 100*BERClassI );
+    fprintf('\n%d: %.2f%%\n', i, 100*BERClassI );
   end;
   ber = ber/C;
 end
