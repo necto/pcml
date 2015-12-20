@@ -2,7 +2,24 @@
 images_list=$(wildcard train/imgs/*.jpg)
 small_images_list=$(subst imgs,small_imgs,$(images_list)) 
 
+submission: istanbul.zip
+
+istanbul.zip: report/report.pdf pred_binary.mat pred_multiclass.mat code/last_updated
+	mkdir -p submission
+	cp report/report.pdf submission/report.pdf
+	cp -r code submission/
+	cp pred_binary.mat submission/pred_binary.mat
+	cp pred_multiclass.mat submission/pred_multiclass.mat
+	zip -r -j istanbul.zip submission
+	rm -r submission
+
+report/report.pdf: report/report.tex report/*.tex report/*.bib report/figures/*
+	cd report && pdflatex report.tex && pdflatex report.tex
+
 small_images: $(small_images_list)
+
+train/negs3.mat train/negs2.mat train/negs1.mat: train
+	matlab -nodesktop -nosplash -nodisplay -r 'hardNegativeMining;quit;'
 
 train:
 	wget "http://cvlabwww.epfl.ch/~cjbecker/pcml_project2/train.tar.gz"
