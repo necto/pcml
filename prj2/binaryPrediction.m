@@ -26,8 +26,8 @@ randomForest = false;     % Random forest
 showWrongPred = false;    % Shows images with wrong prediction
 svm = false;
 rF = false;
-trainModels = false;
-testModels = true;
+trainModels = true;
+testModels = false;
 %% Correct imbalance between classes.
 % There are 964 airplanes, 1162 cars, 1492 horses and 2382 others objects.
 % Here we select randomly 964 objects of each class to create a balaced
@@ -173,8 +173,8 @@ end
 
 if(trainModels)
   fprintf('\nOutput models\n');  
-  outputNNModel(train);
-  %outputRFModel(train);
+  %outputNNModel(train);
+  outputRFModel(train);
 end
 
 if(testModels)

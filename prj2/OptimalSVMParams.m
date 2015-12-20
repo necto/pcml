@@ -5,7 +5,11 @@ function [optimalKernelScale, optimalBoxConstraint, optimalBias] = ...
     if (positiveClass == 1)
         optimalKernelScale = 115.4782;
         optimalBoxConstraint = 2.3713;
-        optimalBias = 3.1623;
+        if (useNegs)
+            optimalBias = 28.84;
+        else
+            optimalBias = 3.1623;
+        end
     elseif (positiveClass == 2)
         optimalKernelScale = 84.8343;
         optimalBoxConstraint = 1.3895;

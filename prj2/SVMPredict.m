@@ -9,9 +9,9 @@ function [ Prediction, Confidence ] = SVMPredict( data )
     svmC3 = load('models/svmC3.mat', 'SVMModel');
     svmC3 = svmC3.('SVMModel');
     
-    [p1, c1] = predict(svmC1, data);
-    [p2, c2] = predict(svmC2, data);
-    [p3, c3] = predict(svmC3, data);
+    [p1, c1] = predict(svmC1, data.X_hog);
+    [p2, c2] = predict(svmC2, data.X_hog);
+    [p3, c3] = predict(svmC3, data.X_hog);
     
     ConfidenceAll = [c1 c2 c3];
     
@@ -23,4 +23,5 @@ function [ Prediction, Confidence ] = SVMPredict( data )
     
     Prediction(negativeClass) = 4;
     Prediction(~negativeClass) = positiveClass(~negativeClass);
+    Prediction = Prediction';
 end
