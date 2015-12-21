@@ -8,7 +8,7 @@ addpath(genpath('./piotr_toolbox'));
 
 % Classes
 [Airplane, Car, Horse, Other] = deal(1, 2, 3, 4);
-
+train = correctImbalanceBtwClasses(train);
 %% Set which method to run
 multiclassNN  = false;	% Neural network with multiclassification
 binaryNN      = false;	% Neural network with binary classification
