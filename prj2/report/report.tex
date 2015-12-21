@@ -217,11 +217,13 @@ We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each cl
 
 \subsection{SVM}
 
+We use One-vs-All scheme, because the time limitations are insufficient to train and tweak the One-vs-One SVM. The missprediction rates for each binary classifier are shown in the Table \ref{tbl:SVMerr}. We use HOG features for this method, as it is known to give good results \cite{zhang2010pedestrian}. Unlike the results of Foody&Co. \cite{
+
 Hard-negation mining.
 
 Optimal parameter choice
 
-we choose parameters with manual coordinate descent using cross validation.
+we choose optimal parameters with manual coordinate descent using cross validation.
 
 \begin{table}
   \centering
@@ -245,9 +247,12 @@ we choose parameters with manual coordinate descent using cross validation.
 
 \subsection{Ensemble Classifier}
 
-highest confidence prediction
+majority + highest confidence prediction
 
 \section{Implementation Details}
+
+We implemented the multiclass SVM classifier, and an Ensemble classifier on top of the three trained classifiers: SVM(HOG), Neyral Networks with CNN and Random Forest with CNN.
+
 
 %\begin{figure}[!t]
 %	\centering
