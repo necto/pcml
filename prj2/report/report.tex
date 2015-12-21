@@ -232,11 +232,17 @@ We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each cl
 
 \subsection{SVM}
 
+We use One-vs-All scheme, because the time limitations are insufficient to train and tweak the One-vs-One SVM. The missprediction rates for each binary classifier are shown in the Table \ref{tbl:SVMerr}. We use HOG features for this method, as it is known to give good results \cite{zhang2010pedestrian}. Unlike the results of Foody&Co. \cite{foody2004relative}, the performance of our SVM model is the worst amongst the tried approaches. Big difference between train and test errors suggests that the model overfit. No wonder, the number of features is bigger than the number of training data points. To overcome this problem we tried:
+
+\paragraph{Feature-reduction} We computed the median histogram, summaruzing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so we were unable to improve the performance of SVM with this reduced feature.
+
+\paragraph{Hard negative mining} 
+
 Hard-negation mining.
 
 Optimal parameter choice
 
-we choose parameters with manual coordinate descent using cross validation.
+we choose optimal parameters with manual coordinate descent using cross validation.
 
 \begin{table}
   \centering
@@ -260,11 +266,14 @@ we choose parameters with manual coordinate descent using cross validation.
 
 \subsection{Ensemble Classifier}
 
-highest confidence prediction
+majority + highest confidence prediction
 
 $weight*min\{\text{error SVM, error NN, error RF}\} $
 
 \section{Implementation Details}
+
+We implemented the multiclass SVM classifier, and an Ensemble classifier on top of the three trained classifiers: SVM(HOG), Neyral Networks with CNN and Random Forest with CNN.
+
 
 %\begin{figure}[!t]
 %	\centering
