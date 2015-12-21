@@ -150,7 +150,7 @@ Lastly, we modify the NN to handle binary classification. This time it predicts 
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & Class BER \\ 
 		\hline Airplane	  & 323 & 285 & 11 & 3 & 24 & 12 ($\pm$ 1)\% \\ 
-		\hline Car			& 383 & 7 & 352 & 0 & 24 &  8 ($\pm$ 2)\% \\ 
+		\hline Car        & 383 & 7 & 352 & 0 & 24 &  8 ($\pm$ 2)\% \\ 
 		\hline Horse      & 513 & 4 & 2 & 450 & 57 &  14 ($\pm$ 2)\% \\ 
 		\hline Other      & 781 & 20 & 16 & 54 & 691 & 12 ($\pm$ 1) \% \\ 
 		\hline 
@@ -180,7 +180,7 @@ We obtain a BER of 10\%. Table \ref{tbl:errClassBal} shows the BER for each clas
 		\begin{tabular}{|c|c|c|c|c|c|c|}
 			\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & Class BER \\ 
 			\hline Airplane    & 322 & 259 & 16 & 1 & 46 & 20 ($\pm$ 1)\% \\ 
-			\hline Car 			 & 382 & 1 & 356 & 2 & 23 & 6 ($\pm$ 1)\% \\ 
+			\hline Car         & 382 & 1 & 356 & 2 & 23 & 6 ($\pm$ 1)\% \\ 
 			\hline Horse       & 489 & 0 & 1 & 393 & 95 & 19 ($\pm$ 1)\% \\ 
 			\hline Other       & 807 & 6 & 9 & 35 & 757 & 6 ($\pm$ 1)\% \\ 
 			\hline 
@@ -192,11 +192,11 @@ We obtain a BER of 10\%. Table \ref{tbl:errClassBal} shows the BER for each clas
 \begin{table}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|}
-		\hline Class 		 & $N_{c}$ & Airplane & Car & Horse & Other & Class BER \\ 
-		\hline Airplane 	& 328 & 303 & 8 & 0 & 17 & 8 ($\pm$ 1)\% \\ 
-		\hline Car 			  & 329 & 6 & 312 & 3 & 8 & 4 ($\pm$ 1)\% \\ 
-		\hline Horse		& 324 & 2 & 0 & 299 & 23 & 8 ($\pm$ 1)\% \\ 
-		\hline Other 	    & 304 & 16 & 6 & 37 & 245 & 20 ($\pm$ 1)\% \\ 
+		\hline Class     & $N_{c}$ & Airplane & Car & Horse & Other & Class BER \\ 
+		\hline Airplane  & 328 & 303 & 8 & 0 & 17 & 8 ($\pm$ 1)\% \\ 
+		\hline Car       & 329 & 6 & 312 & 3 & 8 & 4 ($\pm$ 1)\% \\ 
+		\hline Horse     & 324 & 2 & 0 & 299 & 23 & 8 ($\pm$ 1)\% \\ 
+		\hline Other     & 304 & 16 & 6 & 37 & 245 & 20 ($\pm$ 1)\% \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Predictions error of random forests for each class with balanced training set}
@@ -250,6 +250,7 @@ Where $C$ iterates over all classes, and $weight_C$ is the predicted fraction of
 
 We implemented the multiclass SVM classifier (look at the \emph{SVMPredict.m}), and an Ensemble classifier (\emph{EnsemblePredict.m}) on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
 
+You may want to take a look at our Makefile, and the rule to make predictions to better understand the dataflow in the project. The complete workflow for training all the models and computing the predictions for the test data shoud take a considerable amount of time.
 
 \section{Summary}
 
