@@ -143,6 +143,9 @@ end
 
 %% Produce and save the model
 if (produce_model)
+    ks = optimalKernelScale;
+    bc = optimalBoxConstraint;
+    bias = optimalBias;
     fprintf('Producing model for class %d\n', positiveClass);
     train_labels = (train.y == positiveClass)*2 - 1;
     fprintf('Creating a model on the full train dataset\n');
