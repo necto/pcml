@@ -17,10 +17,11 @@ byMajority = 0;
 byConfidence = 0;
 
 for i = 1:size(PredictionAll, 1)
-    hasMajority = any(histc(PredictionAll(i), classes) > 1);
+    [pred freq] = mode(PredictionsAll(i));
+    hasMajority = any(freq > 1);
     if (hasMajority)
-        Prediction(i) = mode(PredictionAll(i));
-        Confidence(i) = max(ConfidenceAll(i, PredictionAll == Prediction(i)));
+        Prediction(i) = pred;
+        Confidence(i) = max(ConfidenceAll(i, PredictionAll == pred));
         byMajority = byMajority + 1;
     else
         [Confidence(i), idConf] = max(ConfidenceAll(i));
