@@ -10,7 +10,7 @@ istanbul.zip: report/report.pdf pred_binary.mat pred_multiclass.mat code/last_up
 	cp -r code submission/
 	cp pred_binary.mat submission/pred_binary.mat
 	cp pred_multiclass.mat submission/pred_multiclass.mat
-	zip -r -j istanbul.zip submission
+	cd submission && zip -r ../istanbul.zip *
 	rm -r submission
 
 pred_binary.mat pred_multiclass.mat: models/svmC1.mat models/svmC2.mat models/svmC3.mat models/NeuralNetwork.mat models/RandomForest.mat train/train.mat test/test.mat train/negs3.mat train/negs2.mat train/negs1.mat
