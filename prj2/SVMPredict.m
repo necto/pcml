@@ -9,18 +9,34 @@ function [ Prediction, Confidence ] = SVMPredict( data )
     svmC3 = load('models/svmC3.mat', 'SVMModel');
     svmC3 = svmC3.('SVMModel');
     
-    [p1, c1] = predict(svmC1, data);
-    [p2, c2] = predict(svmC2, data);
-    [p3, c3] = predict(svmC3, data);
+    HOG = zscore(data.X_hog);
+    
+    [p1, c1] = predict(svmC1, HOG);
+    [p2, c2] = predict(svmC2, HOG);
+    [p3, c3] = predict(svmC3, HOG);
+    
+    c1 = abs(c1(:,1)); c1 = c1/max(c1);
+    c2 = abs(c2(:,1)); c2 = c2/max(c2);
+    c3 = abs(c3(:,1)); c3 = c3/max(c3);
     
     ConfidenceAll = [c1 c2 c3];
+    PredictionAll = [p1 p2 p3];
+    
+    PositivePrediction = (PredictionAll > 0);
+    
+    PositiveConfidence = zeros(size(ConfidenceAll,1), size(ConfidenceAll, 2));
+    PositiveConfidence(PositivePrediction) = ConfidenceAll(PositivePrediction);
     
     Prediction = zeros(size(data, 1), 1) + 4; % Class 'other' by default
 
+    [pConf, pIdx] = max(PositiveConfidence, [], 2);
     [Confidence, Idx] = max(ConfidenceAll, [], 2);
-    negativeClass = (rem(Idx, 2) == 0);
-    positiveClass = Idx/2;
     
-    Prediction(negativeClass) = 4;
-    Prediction(~negativeClass) = positiveClass(~negativeClass);
+    hasPosPred = pConf > 0;
+    
+    Prediction(hasPosPred) = pIdx(hasPosPred);
+    Prediction(~hasPosPred) = 4;
+    Confidence(hasPosPred) = pConf(hasPosPred);
+    
+    Prediction = Prediction';
 end

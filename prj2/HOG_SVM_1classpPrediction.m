@@ -6,8 +6,9 @@ close all;
 load train/train.mat;
 
 
-positiveClass = 2;
+positiveClass = 3;
 useNegs = false;
+printFigure = true;
 
 negs = [];
 negLabels = [];
@@ -36,7 +37,7 @@ end
 % split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
 K = 2;
-N = size(train.y, 1);
+N = size(train.y, 1)/5;
 idx = randperm(N);
 Nk = floor(N/K);
 idxCV = zeros(K, Nk);
@@ -48,7 +49,7 @@ end;
 [train.X_hog, mu, sigma] = zscore(train.X_hog);
 
 %% HOG SVM prediction
-produce_model = true;
+produce_model = false;
 if (produce_model)
     fprintf('producing model for class %d\n', positiveClass);
     tic
@@ -150,11 +151,11 @@ if (optimize_box_constraint)
     semilogx(box_constraints,berTr);
 end
 
-optimize_kernel_scale = false;
+optimize_kernel_scale = true;
 if (optimize_kernel_scale)
     fprintf('optimizing kernel scale\n');
     rng(1) % platform dependent!!
-    kernel_scales = logspace(1.5, 2.5, 5);
+    kernel_scales = logspace(1, 3, 40);
     for ksi = 1:length(kernel_scales)
         ks = kernel_scales(ksi);
         TeBERSub = zeros(K, 1);
@@ -178,4 +179,19 @@ if (optimize_kernel_scale)
     semilogx(kernel_scales,berTe);
     hold on;
     semilogx(kernel_scales,berTr);
+        
+    hx = xlabel('Kernel scale');
+    hy = ylabel('BER');
+    legend('Test error', 'Training error', 'Location', 'northwest');
+    set(gca,'fontsize',20,'fontname','Helvetica','box','off','tickdir','out','ticklength',[.02 .02],'xcolor',0.5*[1 1 1],'ycolor',0.5*[1 1 1]);
+    set([hx; hy],'fontsize',18,'fontname','avantgarde','color',[.3 .3 .3]);
+    grid on;
+
+    if (printFigure)
+        disp('printing the figure');
+        set(gcf, 'PaperUnits', 'centimeters');
+        set(gcf, 'PaperPosition', [0 0 20 12]);
+        set(gcf, 'PaperSize', [20 12]);
+        print -dpdf 'report/figures/kernel_scale_ber.pdf'
+    end;
 end

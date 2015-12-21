@@ -8,12 +8,27 @@ function [ Prediction, Confidence ] = EnsemblePredict( data )
 
 PredictionAll = [SVMPrediction NNPrediction RFPrediction];
 ConfidenceAll = [SVMConfidence NNConfidence RFConfidence];
-[ConfidenceAllNorm, ~, ~] = zscore(ConfidenceAll);
 
-[~, ConfidenceIdx] = max(ConfidenceAllNorm, [], 2);
+Prediction = zeros(size(PredictionAll, 1), 1);
+Confidence = zeros(size(ConfidenceAll, 1), 1);
 
-Prediction = PredictionAll(sub2ind(size(PredictionAll), ...
-                           1:length(ConfidenceIdx), ConfidenceIdx'));
-Confidence = ConfidenceAll(sub2ind(size(ConfidenceAll), ...
-                           1:length(ConfidenceIdx), ConfidenceIdx'));
+byMajority = 0;
+byConfidence = 0;
+
+for i = 1:size(PredictionAll, 1)
+    predictions = PredictionAll(i,:);
+    [pred, freq] = mode(predictions);
+    hasMajority = any(freq > 1);
+    if (hasMajority)
+        Prediction(i) = pred;
+        Confidence(i) = max(ConfidenceAll(i, predictions == pred));
+        byMajority = byMajority + 1;
+    else
+        [Confidence(i), idConf] = max(ConfidenceAll(i,:));
+        Prediction(i) = PredictionAll(i, idConf);
+        byConfidence = byConfidence + 1;
+    end
+end
+
+fprintf('by majority: %d; by confidence: %d\n', byMajority, byConfidence);
 end
