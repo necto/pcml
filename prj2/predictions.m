@@ -10,9 +10,9 @@ addpath(genpath('./piotr_toolbox'));
 [Airplane, Car, Horse, Other] = deal(1, 2, 3, 4);
 
 %% Set which method to run
-multiclassNN  = true;	% Neural network with multiclassification
+multiclassNN  = false;	% Neural network with multiclassification
 binaryNN      = false;	% Neural network with binary classification
-randomForest  = false;	% Random forest
+randomForest  = true;	% Random forest
 svm           = false;  % SVM
 rF            = false;  % Combination of random forests
 trainModels   = false;	% Train and save NN and RandomForest

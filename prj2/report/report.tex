@@ -57,13 +57,13 @@ To achieve this, we experimented with several Machine Learning method like SVM, 
 \section{Introduction}
 
 The problem of classifying images is a hot topic on which most of the big IT companies are working on.
-Google, Tesla and probably other companies are building autonomous car, that has to be able to recognize in real-time object such as other vehicles, pedestrians, traffic lights, roadsigns...
-Thousands, even millions of images are uploaded and automatically processed in social networks every day.
+Google\cite{GoogleCar}, Tesla\cite{TeslaAutopilot} and probably other companies are building autonomous car, that has to be able to recognize in real-time object such as other vehicles, pedestrians, traffic lights, roadsigns...
+Every day on social networks, millions of images are uploaded, processed and classified\cite{facebook}. 
 
 The system we have to design is simpler than the two previous example, in the sense that there are only 4 categories of objects. Nevertheless, the task of recognizing an object in an image is still complex for many reasons.
 Firstly an image has high dimension, which make the job of building, tuning and testing a model complicated.
 Secondly two very similar images can have different label.
-Take for example the images in figure \ref{fig:car_tire} and \ref{fig:tire} look similar, but they have different label. The first one is labeled as "Car" and the second fall into the "Other" categorie. Moreover the images in figure \ref{fig:car_tire} and \ref{fig:car} don't have a lot in common, but they are both labeled as car.
+Take for example the images in figure \ref{fig:car_tire} and \ref{fig:tire}. They look similar, but they have different label. The first one is labeled as "Car" and the second fall into the "Other" categorie. On the other hand, the images in figure \ref{fig:car_tire} and \ref{fig:car} don't have a lot in common, but they are both labeled as car.
 Sometimes the object is cropped: only a part of it appear in the image. The object can be hidden by another object, or several objects are appearing in the same image, which make it difficult to distinguish the one we are interested in.
 
 For this project the ML methods we can try are limited. The code submitted has to reproduce the results and cannot be larger than 20MB. So we cannot experiment with various toolboxes without violating this limit.
@@ -79,20 +79,20 @@ And for the testing set only the HOG and CNN features are provided, not the orig
 
 \section{Data Description}
 
-The system we have to design has to be able to classify images based on what object they contain. 
+The system we have to design has to be able to classify images based on what object they depict. 
 There are 4 classes: the image can contain an airplane, a car, a horse or neither of them.
 
 A training set containing either color or grayscale images of size 231x231 is given. It contains 6000 images, each associated with a label and two sets of features: the Histogram of Oriented Gradients (HOG) and the OverFeat ImageNet CNN Features.
-Out of these 6000 images there is 964 airplanes, 1162 cars, 1492 horses and 2382 other objects.
+Out of these 6000 images there are 964 airplanes, 1162 cars, 1492 horses and 2382 other objects.
 Unfortunately we don't know if the testing data follows the same distribution.
 
 For acceleration of the experiments, we considered the ways to reduce the number of features. 
-
 One ways is to scale down the input images. However, this affects only the HOG features, as CNN represents the neural network weights and does not depend on the number of pixels in the image.
 
-The CNN feature array seems very sparse. However an investigation shown that each feature(except for the last one) is nonzero for at least 20 images in the train set.
+The CNN feature array seems very sparse. However an investigation shown that each feature (except for the last one) is nonzero for at least 20 images in the training set.
 
-Other way is to find correlations in that matrix. no way: number of features ~36000, number of data-points 6000 -> matrix rank is going to be <= 6000 => there are a lot of linear combinations of the columns.
+Another idea was to find correlations in that matrix. But unfortunately this is infeasible because the CNN features have a dimensionality of 36865 and there are 6000 data samples. The matrix rank is going to be smaller or equal to 6000, which implies that there are a lot of linear combinations of the columns.
+
 
 Note: move from small-pics to the originals require a complete recalibration of SVM meta-parameters
 
@@ -102,6 +102,25 @@ Note: the best-optimized SVM(HOG) gives 0.1734 test BER and 0.0554 train BER on 
 
 Averaging all the boxes into a single histogram does not work.
 
+\paragraph{Training data}
+
+I do not think that a horse, a car and an airplane share any common structure, so it its reasonable to do binary prediction based on the multiclass prediction. Simply:
+y = (y ~= 4)  -- if classifier have not found any of these three, answer no.
+
+Each class should be detected separately, of course:
+
+\begin{lstlisting}
+
+if (y_{horse} == 1) y = 1
+else if (y_{car} == 1) y = 2
+else if (y_{airplane} == 1) y = 3
+else y = 4
+end
+\end{lstlisting}
+
+We should think how do we handle disputed cases (e.g. $y_{horse}$ == 1 and $y_{car} == 1$). we may train 3 additional classifiers for each of those (if we get enough cases for it).
+
+\subsection{Features description}
 \paragraph{HOG feature} HOG is widely use in computer vision. 
 The basic idea is that the shape and appearance of an object is often well characterized by the distribution of local intensity gradients or edge directions \cite{hog}.
 Figure \ref{fig:image_car} and \ref{fig:hog} shows respectively an image form the training set and a visualization of its HOG feature.
@@ -122,28 +141,6 @@ As a consequence we should focus on optimizing the classification based on these
 The testing set contains 11'453 samples and we have to submit two predictions: a binary prediction, that is whether the image contains either a car, a plane or a horse, or neither of them and a multiclass 
 prediction, where we predict the object present in the image.
 
-\paragraph{Training data}
-
-I do not think that a horse, a car and an airplane share any common structure, so it its reasonable to do binary prediction based on the multiclass prediction. Simply:
-y = (y ~= 4)  -- if classifier have not found any of these three, answer no.
-
-Each class should be detected separately, of course:
-
-\begin{lstlisting}
-
-if (y_{horse} == 1) y = 1
-else if (y_{car} == 1) y = 2
-else if (y_{airplane} == 1) y = 3
-else y = 4
-end
-\end{lstlisting}
-
-We should think how do we handle disputed cases (e.g. $y_{horse}$ == 1 and $y_{car} == 1$). we may train 3 additional classifiers for each of those (if we get enough cases for it).
-
-\section{Data visualization and basic exploratory data analysis}
-
-
-\subsection{Performance measures}
 
 \section{Predict test data}
 This section describes the different Machine Learning (ML) methods and models used to classify the images. 
@@ -165,24 +162,24 @@ We used a K equal to 3, because for larger K we waste too much time training the
 The file named \emph{imageClassificationExample.m} given in the project website use a simple neural network (NN) from the \emph{DeepLearnToolbox}.
 In the example, this NN is trained on the HOG features and give a BER of 29.32\% with 3-Fold Cross validation. Note that the others parameters are still set to their default values, that is the number of epochs is 20, the batch size 100, the learning rate 2.
 
-We tried to train the NN with the CNN features and the same configuration, and this time the BER is 12.73\%.
+We tried to train the NN with the CNN features and the same configuration, and this time the BER is 13\%.
 The next step is trying to find optimal values for the parameters with a grid search. As the NN takes quite a long time to train, we cannot afford to do a grid search with too many parameters.
 We obtain the best performance with a learning rate = 3, number of epoch = 90 and batch size = 200. 
-Figure \ref{tbl:errClassNN} shows the results. The overall BER is $\dfrac{1}{C}\sum Class BER= 11.11\%$ . 
+Figure \ref{tbl:errClassNN} shows the results. The overall BER is $\dfrac{1}{C}\sum Class BER= 12\%$ . 
 
-Lastly, we modify the NN to handle binary classification. This time it predicts if an object is in the set {Airplane, Car, Horse} or not. The BER with the same parameters as before is 10.89\%.
+Lastly, we modify the NN to handle binary classification. This time it predicts if an object is in the set {Airplane, Car, Horse} or not. The BER with the same parameters as before is 11\%.
 
 \begin{table}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & BER \\ 
-		\hline Airplane & 302 & 253 & 16 & 1 & 32 & 16.23\% \\ 
-		\hline Car & 367 & 9 & 346 & 1 & 11 & 5.72\% \\ 
-		\hline Horse & 496 & 3 & 4 & 425 & 64 & 14.31\% \\ 
-		\hline Other & 835 & 14 & 21 & 55 & 745 & 10.78 \% \\ 
+		\hline Airplane	  & 323 & 285 & 11 & 3 & 24 & 12 ($\pm$ 1)\% \\ 
+		\hline Car			& 383 & 7 & 352 & 0 & 24 &  8 ($\pm$ 2)\% \\ 
+		\hline Horse      & 513 & 4 & 2 & 450 & 57 &  14 ($\pm$ 2)\% \\ 
+		\hline Other      & 781 & 20 & 16 & 54 & 691 & 12 ($\pm$ 1) \% \\ 
 		\hline 
 	\end{tabular} 
-	\caption{Predictions error of Multiclass NN for each class}
+	\caption{Predictions error of Multi-class NN for each class}
 	\label{tbl:errClassNN}
 \end{table}
 
@@ -192,23 +189,23 @@ As a consequence, we chose to experiment with them to try to outperform our firs
 
 Random forests choose randomly a subset of input variables to build many trees and reduce the variance of the output by taking the average of many outputs.
 
-Here we use the matlab function named \emph{TreeBagger}. We set the number of trees to 300, this value was determined with grid search.
-We obtain a BER of 12.57\% with 3-fold cross validation. Table \ref{tbl:errClassNotBal} shows the predictions error for each class. Take the first line as example. The true class is Airplane and there is $N_c$ sample in it. The following columns shows what the random forest predicted.
+Here we use the Matlab function named \emph{TreeBagger}. We set the number of trees to 300, this value was determined with grid search.
+We obtain a BER of 13\% with 3-fold cross validation. Table \ref{tbl:errClassNotBal} shows the predictions error for each class. Take the first line as example. The true class is Airplane and there is $N_c$ sample in it. The following columns shows what the random forest predicted.
 Here we notice that the majority of error is because the method put an image in the categorie Other when it is actually another one.
 This is maybe because of the class imbalance during the training of the model. Indeed we mention earlier that there is 6000 images: 964 airplanes, 1162 cars, 1492 horses and 2382 other objects.
 
 The next step is to train the model with the same proportion of images in each class, by randomly deleting sample in the classes with more data. Ideally, we would prefer adding images in the class with less samples, so we don't reduce our training set but increase it.
 So we end up with a training set containing 964 images for each class. 
-We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each class.
+We obtain a BER of 10\%. Table \ref{tbl:errClassBal} shows the BER for each class.
 
 \begin{table}[!htb]
 	\centering
 		\begin{tabular}{|c|c|c|c|c|c|c|}
 			\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & BER \\ 
-			\hline Airplane & 332 & 267 & 7 & 0 & 58 & 19.58\% \\ 
-			\hline Car & 397 & 1 & 375 & 4 & 17 & 5.54\% \\ 
-			\hline Horse & 490 & 0 & 0 & 403 & 87 & 17.76\% \\ 
-			\hline Other & 781 & 1 & 11 & 27 & 742 & 4.99\% \\ 
+			\hline Airplane    & 322 & 259 & 16 & 1 & 46 & 20 ($\pm$ 1)\% \\ 
+			\hline Car 			 & 382 & 1 & 356 & 2 & 23 & 6 ($\pm$ 1)\% \\ 
+			\hline Horse       & 489 & 0 & 1 & 393 & 95 & 19 ($\pm$ 1)\% \\ 
+			\hline Other       & 807 & 6 & 9 & 35 & 757 & 6 ($\pm$ 1)\% \\ 
 			\hline 
 		\end{tabular} 
 		\caption{Predictions error of random forests for each class with unbalanced training set}
@@ -219,10 +216,10 @@ We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each cl
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & BER \\ 
-		\hline Airplane & 310 & 293 & 5 & 2 & 10 & 5.48\% \\ 
-		\hline Car & 349 & 12 & 325 & 4 & 8 & 6.88\% \\ 
-		\hline Horse & 311 & 4 & 0 & 286 & 21 & 8.04\% \\ 
-		\hline Other & 315 & 8 & 10 & 39 & 258 & 18.10 \% \\ 
+		\hline Airplane & 310 & 293 & 5 & 2 & 10 & 6 ($\pm$ )\% \\ 
+		\hline Car & 349 & 12 & 325 & 4 & 8 & 7 ($\pm$ )\% \\ 
+		\hline Horse & 311 & 4 & 0 & 286 & 21 & 8 ($\pm$ )\% \\ 
+		\hline Other & 315 & 8 & 10 & 39 & 258 & 18 ($\pm$ )\% \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Predictions error of random forests for each class with balanced training set}
@@ -232,9 +229,9 @@ We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each cl
 
 \subsection{SVM}
 
-We use One-vs-All scheme, because the time limitations are insufficient to train and tweak the One-vs-One SVM. The missprediction rates for each binary classifier are shown in the Table \ref{tbl:SVMerr}. We use HOG features for this method, as it is known to give good results \cite{zhang2010pedestrian}. Unlike the results of Foody&Co. \cite{foody2004relative}, the performance of our SVM model is the worst amongst the tried approaches. Big difference between train and test errors suggests that the model overfit. No wonder, the number of features is bigger than the number of training data points. To overcome this problem we tried:
+We use One-vs-All scheme, because the time at our disposal is insufficient to train and tweak the One-vs-One SVM. The miss-prediction rates for each binary classifier are shown in the Table \ref{tbl:SVMerr}. We use HOG features for this method, as it is known to give good results \cite{zhang2010pedestrian}. Unlike the results of Foody\&Co. \cite{foody2004relative}, the performance of our SVM model is the worst amongst the tried approaches. Big difference between train and test errors suggests that the model overfit. No wonder, the number of features is bigger than the number of training data points. To overcome this problem we tried:
 
-\paragraph{Feature-reduction} We computed the median histogram, summaruzing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so we were unable to improve the performance of SVM with this reduced feature.
+\paragraph{Feature-reduction} We computed the median histogram, summarizing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so we were unable to improve the performance of SVM with this reduced feature.
 
 \paragraph{Hard negative mining} 
 
@@ -303,11 +300,6 @@ For example, other toolboxes performance should be tested. The neural network gi
 Another alternative to improve performance is to enhanced the training set. 
 For this project we received 6000 training images, and when we create a balanced dataset, there are only 3856 left.
 If the neural network is trained with more images, it can improve its performance.
-
-
-
-
-
 
 
 
