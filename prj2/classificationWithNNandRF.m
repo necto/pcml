@@ -1,22 +1,31 @@
-clearvars;
-close all;
+if (exist('reportMode', 'var') == 0)
+  clearvars;
+  close all;
+  % Possible values: 
+  %   binaryNN      : Neural network with binary classification
+  %   multiclassNN  : Neural network with multi-class classification
+  %   randomForest	: Random forest
+  %   svm           : SVM
+  %   rF            : Combination of random forests
+  %   trainModels   : Train and save NN and RandomForest
+  %   testModels    : Load and test NN and RandomForest
+  model = 'multiclassNN';
+  correctImbalance = false;
+end;
+
 % Load features and labels of training data
 load train/train.mat;
 % Load features of testing data
-% load test.mat;
+load test.mat;
 addpath(genpath('./piotr_toolbox'));
 
 % Classes
 [Airplane, Car, Horse, Other] = deal(1, 2, 3, 4);
-train = correctImbalanceBtwClasses(train);
-%% Set which method to run
-multiclassNN  = false;	% Neural network with multiclassification
-binaryNN      = false;	% Neural network with binary classification
-randomForest  = true;	% Random forest
-svm           = false;  % SVM
-rF            = false;  % Combination of random forests
-trainModels   = false;	% Train and save NN and RandomForest
-testModels    = false;  % Load and test NN and RandomForest
+
+%% Correct imbalance
+if(correctImbalance)
+  train = correctImbalanceBtwClasses(train);
+end
 
 %% Split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
@@ -30,7 +39,8 @@ for k = 1:K
 end;
 
 %% Neural network for Binary classification
-if(binaryNN)
+if(strcmp(model, 'binaryNN'))
+  fprintf('\nBinary predictions with NN\n'); 
   BERSub = zeros(K, 1);
   predSub = cell(K, 1);
   for k = 1:K
@@ -42,7 +52,8 @@ if(binaryNN)
 end;
 
 %% Neural network for Multiclass classification
-if(multiclassNN)
+if(strcmp(model, 'multiclassNN'))
+  fprintf('\nMulti-class predictions with NN\n'); 
   BERSub = zeros(K, 1);
   predSub = cell(K, 1);
   for k = 1:K
@@ -54,7 +65,7 @@ if(multiclassNN)
 end;
 
 %% Random forest
-if(randomForest)
+if(strcmp(model, 'randomForest'))
   fprintf('\nRandom Forest\n'); 
   BERSub = zeros(K, 1);
   predSub = cell(K, 1);
@@ -67,7 +78,7 @@ if(randomForest)
 end
 
 %% Support vector machine
-if(svm)
+if(strcmp(model, 'svm'))
   fprintf('\nSVM\n'); 
   BERSub = zeros(K, 1);
   predSub = cell(K, 1);
@@ -80,7 +91,7 @@ if(svm)
 end
 
 %% Train random forests 1 vs others (i.e. Airplane vs. {Car, Horse, Others}
-if(rF)
+if(strcmp(model, 'rF'))
   fprintf('\nRandom Forest combination\n'); 
   BERSub = zeros(K, 1);
   predSub = cell(K, 1);
@@ -127,7 +138,7 @@ if(rF)
 end
 
 %% Create, train and save a NN and RandomForest into folder "models/"
-if(trainModels)
+if(strcmp(model, 'trainModels'))
   fprintf('\nOutput models\n');  
   outputNNModel(train);
   fprintf('\nNN saved\n');  
@@ -136,7 +147,7 @@ if(trainModels)
 end
 
 %% Load and test a NN and RandomForest from folder "models/"
-if(testModels)
+if(strcmp(model, 'testModels'))
   fprintf('\nTestModels\n'); 
   BERSubRF = zeros(K, 1);
   BERSubNN = zeros(K, 1);

@@ -13,7 +13,7 @@ istanbul.zip: report/report.pdf pred_binary.mat pred_multiclass.mat code/last_up
 	zip -r -j istanbul.zip submission
 	rm -r submission
 
-pred_binary.mat pred_multiclass.mat: models/svmC1.mat models/cvmC2.mat models/svmC3.mat models/NeuralNetwork.mat models/RandomForest.mat
+pred_binary.mat pred_multiclass.mat: models/svmC1.mat models/svmC2.mat models/svmC3.mat models/NeuralNetwork.mat models/RandomForest.mat
 	matlab -nodesktop -nosplash -nodisplay -r 'predict;quit'
 
 code/last_updated: Makefile *.m
@@ -46,7 +46,6 @@ train/small_imgs/%.jpg : train/imgs/%.jpg train/small_imgs
 train/small.mat: small_train_features.m $(small_images_list)
 	matlab -nodesktop -nosplash -nodisplay -r 'small_train_features;quit;'
 
-
 overfeat.tgz:
 	wget "http://cilvr.nyu.edu/lib/exe/fetch.php?media=overfeat:overfeat-v04-2.tgz" -O overfeat.tgz
 
@@ -55,3 +54,5 @@ overfeat: overfeat.tgz
 	tar -xvzf overfeat.tgz
 	cd overfeat && python download_weights.py
 
+NNandRandomForestModels: *.m
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;model='trainModels';correctImbalance=false;classificationWithNNandRF;quit"
