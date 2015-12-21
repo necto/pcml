@@ -35,12 +35,8 @@ function [ Prediction, Confidence ] = SVMPredict( data )
     hasPosPred = pConf > 0;
     
     Prediction(hasPosPred) = pIdx(hasPosPred);
+    Prediction(~hasPosPred) = 4;
     Confidence(hasPosPred) = pConf(hasPosPred);
     
-    %positiveClass = Idx;
-    %negativeClass = (PredictionAll(Idx) == -1);
-    
-    %Prediction(negativeClass) = 4;
-    %Prediction(~negativeClass) = positiveClass(~negativeClass);
-    %Prediction = Prediction';
+    Prediction = Prediction';
 end

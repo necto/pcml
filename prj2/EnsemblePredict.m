@@ -11,21 +11,21 @@ ConfidenceAll = [SVMConfidence NNConfidence RFConfidence];
 
 Prediction = zeros(size(PredictionAll, 1), 1);
 Confidence = zeros(size(ConfidenceAll, 1), 1);
-classes = unique(PredictionAll);
 
 byMajority = 0;
 byConfidence = 0;
 
 for i = 1:size(PredictionAll, 1)
-    [pred freq] = mode(PredictionsAll(i));
+    predictions = PredictionAll(i,:);
+    [pred, freq] = mode(predictions);
     hasMajority = any(freq > 1);
     if (hasMajority)
         Prediction(i) = pred;
-        Confidence(i) = max(ConfidenceAll(i, PredictionAll == pred));
+        Confidence(i) = max(ConfidenceAll(i, predictions == pred));
         byMajority = byMajority + 1;
     else
-        [Confidence(i), idConf] = max(ConfidenceAll(i));
-        Prediction(i) = PredictionAll(idConf);
+        [Confidence(i), idConf] = max(ConfidenceAll(i,:));
+        Prediction(i) = PredictionAll(i, idConf);
         byConfidence = byConfidence + 1;
     end
 end
