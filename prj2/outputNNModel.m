@@ -1,4 +1,7 @@
 function outputNNModel( train )
+% This function create and train a neural network to predict label 
+% as function of the CNN features. The NN is saved to the file
+% "models/NeuralNetwork.mat".
 addpath(genpath('./DeepLearnToolbox'))
 
 rng(8339);  % fix seed, this    NN may be very sensitive to initialization
@@ -33,6 +36,8 @@ LL = [1*(train.y == 1), ...
 [nn, L] = nntrain(nn, train.normX, LL, opts);
 
 
+% Save NN as well as mu and sigma (To normalize testing set)
+% in "models/RandomForest.mat"
 save('models/NeuralNetwork', 'nn', 'mu', 'sigma'); 
 
 end

@@ -58,7 +58,7 @@ We tried to improve the accuracy of the system by experimenting with different m
 
 The problem of classifying images is a hot topic on which most of the big IT companies are working on.
 Google, Tesla and probably other companies are building autonomous car, that has to be able to recognize in real-time object such as other vehicles, pedestrians, traffic lights, roadsigns...
-Thousands, even millions of images are uploaded and automatically processed in social networks every days.
+Thousands, even millions of images are uploaded and automatically processed in social networks every day.
 
 The system we have to design is simpler than the two previous example, in the sense that there are only 4 categories of objects. Nevertheless, the task of recognizing an object in an image is still complex for many reasons.
 Firstly an image has high dimension, which make the job of building, tuning and testing a model complicated.
@@ -168,8 +168,23 @@ In the example, this NN is trained on the HOG features and give a BER of 29.32\%
 We tried to train the NN with the CNN features and the same configuration, and this time the BER is 12.73\%.
 The next step is trying to find optimal values for the parameters with a grid search. As the NN takes quite a long time to train, we cannot afford to do a grid search with too many parameters.
 We obtain the best performance with a learning rate = 3, number of epoch = 90 and batch size = 200. 
-The BER is 11.24\%.
+Figure \ref{tbl:errClassNN} shows the results. The total BER is $\dfrac{1}{C}\sum Class BER= 11.11\%$ . 
 
+Lastly, we modify the NN to handle binary classification. This time it predicts if an object is in the set {Airplane, Car, Horse} or not. The BER with the same parameters as before is 10.89\%.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|}
+		\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & BER \\ 
+		\hline Airplane & 302 & 253 & 16 & 1 & 32 & 16.23\% \\ 
+		\hline Car & 367 & 9 & 346 & 1 & 11 & 5.72\% \\ 
+		\hline Horse & 496 & 3 & 4 & 425 & 64 & 14.31\% \\ 
+		\hline Other & 835 & 14 & 21 & 55 & 745 & 10.78 \% \\ 
+		\hline 
+	\end{tabular} 
+	\caption{Predictions error of Multiclass NN for each class}
+	\label{tbl:errClassNN}
+\end{table}
 
 \subsection{Random Forests}
 We saw in class that Random Forests (RF) are one of the last techniques capable to compete with Neural Networks.
@@ -196,7 +211,7 @@ We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each cl
 			\hline Other & 781 & 1 & 11 & 27 & 742 & 4.99\% \\ 
 			\hline 
 		\end{tabular} 
-		\caption{Predictions error for each class with unbalanced training set}
+		\caption{Predictions error of random forests for each class with unbalanced training set}
 		\label{tbl:errClassNotBal}
 \end{table}
 
@@ -210,7 +225,7 @@ We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each cl
 		\hline Other & 315 & 8 & 10 & 39 & 258 & 18.10 \% \\ 
 		\hline 
 	\end{tabular} 
-	\caption{Predictions error for each class with balanced training set}
+	\caption{Predictions error of random forests for each class with balanced training set}
 	\label{tbl:errClassBal}
 \end{table}
 
@@ -225,13 +240,13 @@ we choose parameters with manual coordinate descent using cross validation.
 
 \begin{table}
   \centering
-  \begin{tabuler}{l|l|l}
+  \begin{tabular}{l|l|l}
     \hline
     Class & CV BER & CV BER with additional negative samples \\ \hline
     Airplane & 11 ($\pm$ 2) \%  & \\
     Car & 9 ($\pm$ 2) \% & \\
     Horse & 15 ($\pm$ 2) \% & \\ \hline
-  \end{tabuler}
+  \end{tabular}
   \caption{Prediction error for each class for SVM with and without hard-negative mined samples}
   \label{tbl:SVMerr}
 \end{table}
@@ -261,8 +276,13 @@ highest confidence
 \section{Summary}
 
 
+\paragraph{Improve the performance of the system}
+We can take several directions to improve the performance of the system.
+For example, other toolboxes performance should be tested. The neural network given for this lab is outdated and no longer maintained as stated in their website \cite{deeplearningtoolbox}. Other alternative are suggested: Theano, torch or tensorflow. It is a path that is definitely worth exploring.
 
-
+Another alternative to improve performance is to enhanced the training set. 
+For this project we received 6000 training images, and when we create a balanced dataset, there are only 3856 left.
+If the neural network is trained with more images, it can improve its performance.
 
 
 

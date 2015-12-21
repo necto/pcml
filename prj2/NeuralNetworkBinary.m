@@ -1,4 +1,6 @@
 function [ y_pred, ber ] = NeuralNetworkBinary( Tr, Te )
+% Create and train a Neural network to do binary classification (here there
+% is only 2 classes). The NN is trained with Tr, and tested on Te
 addpath(genpath('./DeepLearnToolbox'))
 
 rng(8339);  % fix seed, this    NN may be very sensitive to initialization
@@ -6,8 +8,8 @@ rng(8339);  % fix seed, this    NN may be very sensitive to initialization
 % setup NN. The first layer needs to have number of features neurons,
 %  and the last layer the number of classes (here four).
 nn = nnsetup([size(Tr.X_cnn,2) 10 2]);
-opts.numepochs =  20;   %  Number of full sweeps through data
-opts.batchsize = 100;  %  Take a mean gradient step over this many samples
+opts.numepochs =  90;   %  Number of full sweeps through data
+opts.batchsize = 200;  %  Take a mean gradient step over this many samples
 
 % if == 1 => plots trainin error as the NN is trained
 opts.plot               = 0;
