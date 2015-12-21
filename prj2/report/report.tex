@@ -50,7 +50,7 @@ EPFL \\
 \begin{abstract}
 In this report we describe our results for the second project of the 2015 PCML class.
 Our goal is to design a system that, given an image, is able to recognize three kinds of object in it.
-To achieve this, we experimented with several Machine Learning method like SVM, Random Forests and Neural Networks. Each method was individually tuned to improve its performance, and finally we tried to improve the accuracy of the system by combining different methods.
+To achieve this, we experimented with several Machine Learning methods: SVM, Random Forests and Neural Networks. Each method was individually tuned to improve its performance, and finally we tried to improve the accuracy of the system by combining different methods.
 
 \end{abstract}
 
@@ -192,7 +192,7 @@ Random forests choose randomly a subset of input variables to build many trees a
 Here we use the Matlab function named \emph{TreeBagger}. We set the number of trees to 300, this value was determined with grid search.
 We obtain a BER of 13\% with 3-fold cross validation. Table \ref{tbl:errClassNotBal} shows the predictions error for each class. Take the first line as example. The true class is Airplane and there is $N_c$ sample in it. The following columns shows what the random forest predicted.
 Here we notice that the majority of error is because the method put an image in the categorie Other when it is actually another one.
-This is maybe because of the class imbalance during the training of the model. Indeed we mention earlier that there is 6000 images: 964 airplanes, 1162 cars, 1492 horses and 2382 other objects.
+This is maybe because of the class imbalance during the training of the model. Indeed we mention earlier that there are 6000 images: 964 airplanes, 1162 cars, 1492 horses and 2382 other objects.
 
 The next step is to train the model with the same proportion of images in each class, by randomly deleting sample in the classes with more data. Ideally, we would prefer adding images in the class with less samples, so we don't reduce our training set but increase it.
 So we end up with a training set containing 964 images for each class. 
@@ -233,22 +233,19 @@ We use One-vs-All scheme, because the time at our disposal is insufficient to tr
 
 \paragraph{Feature-reduction} We computed the median histogram, summarizing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so we were unable to improve the performance of SVM with this reduced feature.
 
-\paragraph{Hard negative mining} 
+\paragraph{Hard negative mining} A cheap way to expand the training set is to add the slightly-shaked negative images which cause misspredictions. This helps eliminate false positives improving the overal precision of the classifier, although it requires recalibration of the SVM parameters. Unfortunately, as you can see from the Table \ref{tbl:SVMerr}, it also did not help much.
 
-Hard-negation mining.
-
-Optimal parameter choice
-
-we choose optimal parameters with manual coordinate descent using cross validation.
+We chose optimal parameters using a manual form of coordinate descent, applying cross validation to a number of candidate values. Since the computation for each point takes a long time, we could not reach the strict optimum, but judging by the shape of the curve, e.g. Figure \ref{fig:SVMKernelScaleBER}, we got close enough.
 
 \begin{table}
   \centering
-  \begin{tabular}{l|l|l}
+  \begin{tabular}{|l|r|r|}
     \hline
     Class & CV BER & CV BER with additional negative samples \\ \hline
-    Airplane & 11 ($\pm$ 2) \% 10 ($\pm$ 1) & \\
+    Airplane & 11 ($\pm$ 2) \% & 10 ($\pm$ 1) \% \\
     Car & 9 ($\pm$ 2) \% & 9 ($\pm$ 2) \% \\
-    Horse & 15 ($\pm$ 2) \% & 15 ($\pm$ 2) \% \\ \hline
+    Horse & 15 ($\pm$ 2) \% & 15 ($\pm$ 2) \% \\
+    \hline
   \end{tabular}
   \caption{Prediction error for each class for SVM with and without hard-negative mined samples}
   \label{tbl:SVMerr}
@@ -259,17 +256,22 @@ we choose optimal parameters with manual coordinate descent using cross validati
   \centering
   \includegraphics[width=0.9\textwidth]{figures/kernel_scale_ber.pdf}
   \caption{Dependency of train ant test BER of the Scale of the SVM kernel.}
+  \label{fig:SVMKernelScaleBER}
 \end{figure}
 
 \subsection{Ensemble Classifier}
 
-majority + highest confidence prediction
+On top of the three classifiers, described above, we implemented an ensemble classifier. It uses the majority vote, with the-most-confiedent-wins fallback. We expect it to berform at least as the best of the three comprising classifiers. The training of all the models takes a long time on the available resources. Therefore, we are not able to directly measure the precision of the combined predictor, as we did for its components.
 
-$weight*min\{\text{error SVM, error NN, error RF}\} $
+We estimate the expected multiclass prediction error for the classifier with the following formula:
+\[
+BER_{ensemble} = \sum_C weight_C*min(BER_{SVM}^C, BER_{NN}^C, BER_{RF}^C)
+\]
+Where $C$ iterates over all classes, and $weight_C$ is the predicted fraction of images belonging to that class on the test dataset. The calculated value is $BER_{ensemble} \approx 7\%$.
 
 \section{Implementation Details}
 
-We implemented the multiclass SVM classifier, and an Ensemble classifier on top of the three trained classifiers: SVM(HOG), Neyral Networks with CNN and Random Forest with CNN.
+We implemented the multi-class SVM classifier, and an Ensemble classifier on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
 
 
 %\begin{figure}[!t]
@@ -301,7 +303,7 @@ Another alternative to improve performance is to enhanced the training set.
 For this project we received 6000 training images, and when we create a balanced dataset, there are only 3856 left.
 If the neural network is trained with more images, it can improve its performance.
 
-
+SVM, clearly needs more training images as well. We could tackle the dimentionality problem by using less buckets, but in this case it is not feasible, as we are not given the images themselves, only the precomputed features.
 
 \bibliographystyle{plain}
 \bibliography{References.bib}
