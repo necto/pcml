@@ -50,7 +50,7 @@ EPFL \\
 \begin{abstract}
 In this report we describe our results for the second project of the 2015 PCML class.
 Our goal is to design a system that, given an image, is able to recognize three kinds of object in it.
-We tried to improve the accuracy of the system by experimenting with different methods.
+To achieve this, we experimented with several Machine Learning method like SVM, Random Forests and Neural Networks. Each method was individually tuned to improve its performance, and finally we tried to improve the accuracy of the system by combining different methods.
 
 \end{abstract}
 
@@ -168,7 +168,7 @@ In the example, this NN is trained on the HOG features and give a BER of 29.32\%
 We tried to train the NN with the CNN features and the same configuration, and this time the BER is 12.73\%.
 The next step is trying to find optimal values for the parameters with a grid search. As the NN takes quite a long time to train, we cannot afford to do a grid search with too many parameters.
 We obtain the best performance with a learning rate = 3, number of epoch = 90 and batch size = 200. 
-Figure \ref{tbl:errClassNN} shows the results. The total BER is $\dfrac{1}{C}\sum Class BER= 11.11\%$ . 
+Figure \ref{tbl:errClassNN} shows the results. The overall BER is $\dfrac{1}{C}\sum Class BER= 11.11\%$ . 
 
 Lastly, we modify the NN to handle binary classification. This time it predicts if an object is in the set {Airplane, Car, Horse} or not. The BER with the same parameters as before is 10.89\%.
 
@@ -262,6 +262,8 @@ we choose parameters with manual coordinate descent using cross validation.
 
 highest confidence prediction
 
+$weight*min\{\text{error SVM, error NN, error RF}\} $
+
 \section{Implementation Details}
 
 %\begin{figure}[!t]
@@ -282,6 +284,7 @@ highest confidence prediction
 
 
 \section{Summary}
+
 
 
 \paragraph{Improve the performance of the system}
