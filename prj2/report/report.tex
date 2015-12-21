@@ -234,15 +234,12 @@ We obtain a BER of 9.68\%. Table \ref{tbl:errClassBal} shows the BER for each cl
 
 We use One-vs-All scheme, because the time limitations are insufficient to train and tweak the One-vs-One SVM. The missprediction rates for each binary classifier are shown in the Table \ref{tbl:SVMerr}. We use HOG features for this method, as it is known to give good results \cite{zhang2010pedestrian}. Unlike the results of Foody&Co. \cite{foody2004relative}, the performance of our SVM model is the worst amongst the tried approaches. Big difference between train and test errors suggests that the model overfit. No wonder, the number of features is bigger than the number of training data points. To overcome this problem we tried:
 
-\paragraph{Feature-reduction} We computed the median histogram, summaruzing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so we were unable to improve the performance of SVM with this reduced feature.
+\paragraph{Feature-reduction}. We computed the median histogram, summaruzing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so we were unable to improve the performance of SVM with this reduced feature.
 
-\paragraph{Hard negative mining} 
+\paragraph{Hard negative mining}. A cheap way to expand the training set is to add the slightly-shaked negative images which cause misspredictions. This helps eliminate false positives improving the overal precision of the classifier, although it requires recalibration of the SVM parameters.
 
-Hard-negation mining.
-
+We chose optimal parameters using a manual form of coordinate descent, applying cross validation to a number of candidate values. Since the computation for each point takes a long time, we could not reach the strict optimum, but judging by the shape of the curve, e.g. Figure \cite{fig:SVMKernelScaleBER}, we got close enough.
 Optimal parameter choice
-
-we choose optimal parameters with manual coordinate descent using cross validation.
 
 \begin{table}
   \centering
@@ -262,11 +259,13 @@ we choose optimal parameters with manual coordinate descent using cross validati
   \centering
   \includegraphics[width=0.9\textwidth]{figures/kernel_scale_ber.pdf}
   \caption{Dependency of train ant test BER of the Scale of the SVM kernel.}
+  \label{fig:SVMKernelScaleBER}
 \end{figure}
 
 \subsection{Ensemble Classifier}
 
-majority + highest confidence prediction
+On top of the three classifiers, described above, we implemented an ensemble classifier. It uses the majority vote, with the-most-confiedent-wins fallback. We expect it to berform at least as the best of the three comprising classifiers.
+
 
 \section{Implementation Details}
 
