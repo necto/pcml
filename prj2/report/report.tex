@@ -274,26 +274,11 @@ Where $C$ iterates over all classes, and $weight_C$ is the predicted fraction of
 We implemented the multi-class SVM classifier, and an Ensemble classifier on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
 
 
-%\begin{figure}[!t]
-%	\centering
-%	\subfigure[Scatter plot of one input variable vs output]{\label{fig:scatter}\includegraphics[width=0.55\textwidth]{figures/X58vsY.pdf}}
-%	\subfigure[Histogram of $\boldmath{y\_train}$]{\label{fig:histY}\includegraphics[width=0.4\textwidth]{figures/histY.pdf}}
-%	\caption{Data analysis}
-%\end{figure}
-
-
-
-%\begin{figure}[!t]
-%	\center
-%	\includegraphics[width=0.8\textwidth]{figures/ridgeRegLoss.pdf}
-%	\caption{Plot of the test and training error for ridge regression}
-%	\label{fig:ridgeRegError}
-%\end{figure}
-
-
 \section{Summary}
 
-
+In this report we described the methods used to build the image recognition system. 
+Neural networks, random forests and SVM are trained and tuned individually so that they offer a performance as good as possible.
+Finally we combined those three methods to predict the come up with the binary and multi-class predictions we have to submit. 
 
 \paragraph{Improve the performance of the system}
 We can take several directions to improve the performance of the system.
@@ -303,7 +288,7 @@ Another alternative to improve performance is to enhanced the training set.
 For this project we received 6000 training images, and when we create a balanced dataset, there are only 3856 left.
 If the neural network is trained with more images, it can improve its performance.
 
-SVM, clearly needs more training images as well. We could tackle the dimentionality problem by using less buckets, but in this case it is not feasible, as we are not given the images themselves, only the precomputed features.
+SVM, clearly needs more training images as well. We could tackle the dimensionality problem by using less buckets, but in this case it is not feasible, as we are not given the images themselves, only the precomputed features.
 
 \bibliographystyle{plain}
 \bibliography{References.bib}
