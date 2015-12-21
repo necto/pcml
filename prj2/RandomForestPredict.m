@@ -1,10 +1,17 @@
 function [ Prediction, Confidence ] = RandomForestPredict( test )
-%RANDOMFORESTPREDICT Summary of this function goes here
-%   Detailed explanation goes here
+% A random forest has been trained and saved in "RandomForest.mat".
+% Here we simply load it and predict label and confidence for the testing 
+% set "test".
 
+  % Load decision trees
   load('models/RandomForest.mat');
+
+  % Predict the label for the testing set test 
   [YFIT,scores] = predict(B, test.X_cnn);
   Prediction = str2num(cell2mat(YFIT));
+  
+  % For each sample, scores contains a score for each class
+  % Compute confidence as highestScore*(highestScore-secondHighestScore)
   [max1, i] = max(scores,[], 2);
   for l = 1:size(scores,1);
     scores(l, i(l)) = -inf;

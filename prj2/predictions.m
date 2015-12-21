@@ -7,62 +7,18 @@ load train/train.mat;
 addpath(genpath('./piotr_toolbox'));
 
 % Classes
-Airplane = 1; 
-Car = 2;
-Horse = 3;
-Other = 4;
-% Prior probabilities for each class
-totalNbrTrainingSamples = length(train.y);
-pA = sum(train.y==Airplane)/totalNbrTrainingSamples;
-pC = sum(train.y==Car)/totalNbrTrainingSamples;
-pH = sum(train.y==Horse)/totalNbrTrainingSamples;
-pO = sum(train.y==Other)/totalNbrTrainingSamples;
-prior = [pA, pC, pH, pO];
+[Airplane, Car, Horse, Other] = deal(1, 2, 3, 4);
 
 %% Set which method to run
-multiclassNN = false;     % Neural network with 4 classes
-binaryNN = false;          % Neural network with 2 classes
-randomForest = false;     % Random forest
-showWrongPred = false;    % Shows images with wrong prediction
-svm = false;
-rF = false;
-trainModels = true;
-testModels = false;
-%% Correct imbalance between classes.
-% There are 964 airplanes, 1162 cars, 1492 horses and 2382 others objects.
-% Here we select randomly 964 objects of each class to create a balaced
-% training set
+multiclassNN  = true;	% Neural network with multiclassification
+binaryNN      = false;	% Neural network with binary classification
+randomForest  = false;	% Random forest
+svm           = false;  % SVM
+rF            = false;  % Combination of random forests
+trainModels   = false;	% Train and save NN and RandomForest
+testModels    = false;  % Load and test NN and RandomForest
 
-% minNbr = 964;
-% % Pick randomly 964 samples per class
-% idx1 = find(train.y==1);
-% perm = randperm(length(idx1));
-% idx1 = idx1(perm);
-% idx2 = find(train.y==2);
-% perm = randperm(length(idx2));
-% idx2 = idx2(perm);
-% idx2 = idx2(1:minNbr);
-% idx3 = find(train.y==3);
-% perm = randperm(length(idx3));
-% idx3 = idx3(perm);
-% idx3 = idx3(1:minNbr);
-% idx4 = find(train.y==4);
-% perm = randperm(length(idx4));
-% idx4 = idx4(perm);
-% idx4 = idx4(1:minNbr);
-% 
-% idxTr = vertcat(idx1, idx2, idx3, idx4);
-% perm = randperm(length(idxTr));
-% idxTr = idxTr(perm);
-% 
-% train.X_hog = train.X_hog(idxTr,:);
-% train.X_cnn = train.X_cnn(idxTr,:);
-% train.y = train.y(idxTr);
-
-% Build new training set
-
-
-%% split randomly into train/test, use K-fold
+%% Split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
 K = 3;
 N = size(train.y, 1);
@@ -73,7 +29,7 @@ for k = 1:K
     idxCV(k,:) = idx(1 + (k-1)*Nk:k*Nk);
 end;
 
-%% Neural network with 2 classes
+%% Neural network for Binary classification
 if(binaryNN)
   BERSub = zeros(K, 1);
   predSub = cell(K, 1);
@@ -85,7 +41,7 @@ if(binaryNN)
   fprintf('\nK-fold(K = %d) BER for binary NN: %.2f%%\n\n', K, 100*ber ); 
 end;
 
-%% Neural network with 4 classes
+%% Neural network for Multiclass classification
 if(multiclassNN)
   BERSub = zeros(K, 1);
   predSub = cell(K, 1);
@@ -96,7 +52,6 @@ if(multiclassNN)
   ber = mean(BERSub);
   fprintf('\nK-fold(K = %d) BER for Multiclass NN: %.2f%%\n\n', K, 100*ber ); 
 end;
-
 
 %% Random forest
 if(randomForest)
@@ -124,6 +79,7 @@ if(svm)
   fprintf('\nK-fold(K = %d) BER for SVM: %.2f%%\n\n', K, 100*ber ); 
 end
 
+%% Train random forests 1 vs others (i.e. Airplane vs. {Car, Horse, Others}
 if(rF)
   fprintf('\nRandom Forest combination\n'); 
   BERSub = zeros(K, 1);
@@ -168,15 +124,18 @@ if(rF)
   end
   ber = mean(BERSub);
   fprintf('\nK-fold(K = %d) BER for Random forest: %.2f%%\n\n', K, 100*ber ); 
-  
 end
 
+%% Create, train and save a NN and RandomForest into folder "models/"
 if(trainModels)
   fprintf('\nOutput models\n');  
   outputNNModel(train);
+  fprintf('\nNN saved\n');  
   outputRFModel(train);
+  fprintf('\nRandom forest saved\n');
 end
 
+%% Load and test a NN and RandomForest from folder "models/"
 if(testModels)
   fprintf('\nTestModels\n'); 
   BERSubRF = zeros(K, 1);
@@ -190,8 +149,8 @@ if(testModels)
     [ PredictionRF, ConfidenceRF ] = RandomForestPredict(Te); 
     BERSubRF(k) =  BERM( Te.y, PredictionRF );
   end
-  berNN = mean(BERSubNN)
-  berRF = mean(BERSubRF)
+  berNN = mean(BERSubNN);
+  berRF = mean(BERSubRF);
+  fprintf('\nK-fold(K = %d)\nBER for Random forest: %.2f%%\nBER for NN: %.2f%%\n',...
+  K, 100*berRF, 100*berNN);
 end
-%% Save results
-% save('pred_binary', 'Ytest');

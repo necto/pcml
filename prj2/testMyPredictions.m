@@ -26,7 +26,7 @@ end
 
 % check size
 [nU,nA] = size(Ytest);
-if (nU ~= 11453) && (nA ~= 1)
+if (nU ~= 11453) || (nA ~= 1)
   error('size of Ytest is incorrect');
 end
 

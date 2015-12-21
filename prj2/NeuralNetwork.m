@@ -1,4 +1,6 @@
 function [ classVote, ber ] = NeuralNetwork( Tr, Te )
+% Create and train a Neural network to do multiclass classification (here 
+% there are 4 classes. The NN is trained with Tr, and tested on Te
 addpath(genpath('./DeepLearnToolbox'))
 
 rng(8339);  % fix seed, this    NN may be very sensitive to initialization
