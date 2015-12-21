@@ -1,6 +1,5 @@
 function [ Prediction, Confidence ] = EnsemblePredict( data )
-%EnsemblePredict Summary of this function goes here
-%   Detailed explanation goes here
+% Predict lables using a combination of SVM, NN and Random Forests
 
 [SVMPrediction, SVMConfidence] = SVMPredict(data);
 [NNPrediction, NNConfidence] = NNPredict(data);

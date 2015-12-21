@@ -1,7 +1,6 @@
 function [optimalKernelScale, optimalBoxConstraint, optimalBias] = ...
     OptimalSVMParams( positiveClass, useNegs )
-%OPTIMALSVMPARAMS Summary of this function goes here
-%   Detailed explanation goes here
+
     if (positiveClass == 1)
         optimalKernelScale = 115.4782;
         optimalBoxConstraint = 2.3713;

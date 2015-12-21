@@ -1,6 +1,4 @@
 function [ Prediction, Confidence ] = SVMPredict( data )
-%SVMPREDICT Summary of this function goes here
-%   Detailed explanation goes here
 
     svmC1 = load('models/svmC1.mat', 'SVMModel');
     svmC1 = svmC1.('SVMModel');

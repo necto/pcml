@@ -54,5 +54,5 @@ overfeat: overfeat.tgz
 	tar -xvzf overfeat.tgz
 	cd overfeat && python download_weights.py
 
-NNandRandomForestModels: *.m
+models/NeuralNetwork.mat models/RandomForest.mat: *.m
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;model='trainModels';correctImbalance=false;classificationWithNNandRF;quit"

@@ -5,11 +5,11 @@ if (exist('reportMode', 'var') == 0)
   %   binaryNN      : Neural network with binary classification
   %   multiclassNN  : Neural network with multi-class classification
   %   randomForest	: Random forest
-  %   svm           : SVM
   %   rF            : Combination of random forests
   %   trainModels   : Train and save NN and RandomForest
   %   testModels    : Load and test NN and RandomForest
   model = 'multiclassNN';
+  % Correct class imbalance in training set
   correctImbalance = false;
 end;
 
@@ -77,20 +77,7 @@ if(strcmp(model, 'randomForest'))
   fprintf('\nK-fold(K = %d) BER for Random forest: %.2f%%\n\n', K, 100*ber ); 
 end
 
-%% Support vector machine
-if(strcmp(model, 'svm'))
-  fprintf('\nSVM\n'); 
-  BERSub = zeros(K, 1);
-  predSub = cell(K, 1);
-  for k = 1:K
-    [Tr, Te] = split4crossValidation(k, idxCV, train);
-    [predSub{k}, BERSub(k)] = SVM(Tr, Te); 
-  end
-  ber = mean(BERSub);
-  fprintf('\nK-fold(K = %d) BER for SVM: %.2f%%\n\n', K, 100*ber ); 
-end
-
-%% Train random forests 1 vs others (i.e. Airplane vs. {Car, Horse, Others}
+%% Train random forests 1 vs others (i.e. Airplane vs. {Car, Horse, Others},...)
 if(strcmp(model, 'rF'))
   fprintf('\nRandom Forest combination\n'); 
   BERSub = zeros(K, 1);
