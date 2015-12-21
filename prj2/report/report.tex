@@ -248,9 +248,11 @@ Where $C$ iterates over all classes, and $weight_C$ is the predicted fraction of
 
 \section{Implementation Details}
 
-We implemented the multiclass SVM classifier (look at the \emph{SVMPredict.m}), and an Ensemble classifier (\emph{EnsemblePredict.m}) on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
+We implemented the multiclass SVM classifier (look at the \emph{SVMPredict.m}), and an Ensemble classifier (\emph{EnsemblePredict.m}) on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature. We use the builtin MatLab \emph{fitcsvm} function as a base for SVM predictor.
 
-You may want to take a look at our Makefile, and the rule to make predictions to better understand the dataflow in the project. The complete workflow for training all the models and computing the predictions for the test data shoud take a considerable amount of time.
+You may want to take a look at our \emph{Makefile}, and the rule to make predictions to better understand the dataflow in the project. The complete workflow for training all the models and computing the predictions for the test data shoud take a considerable amount of time.
+
+We use the \emph{DeepLearnToolbox} privided in the class for neural networks implementation. We also use \emph{piotr\_toolbox} to generate HOG features for the reducted images, mentioned in the SVM section.
 
 \section{Summary}
 
