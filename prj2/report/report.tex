@@ -74,7 +74,7 @@ The testing set provides only the Histogram of Oriented Gradients(HOG) and Convo
 	\subfigure[Car (label = 2)]{\label{fig:car_tire}\includegraphics[width=0.3\textwidth]{figures/train00368.jpg}}
 	\subfigure[Tire (label = 4)]{\label{fig:tire}\includegraphics[width=0.3\textwidth]{figures/train00942.jpg}}
 	\subfigure[Another car (label = 2)]{\label{fig:car}\includegraphics[width=0.3\textwidth]{figures/train04139.jpg}}
-	\caption{Some sample from the training set}
+	\caption{Some samples from the training set}
 \end{figure}
 
 \section{Data Description}
@@ -96,7 +96,7 @@ The CNN feature array seems very sparse. However an investigation shown that eac
 We do not find any common structure for a horse, a car or an airplane, so it is reasonable to do binary prediction based on the multiclass prediction. Simply:
 $y_{binary} = (y_{multiclass} \neq 4)$  -- if the classifier did not recognize any of the three classes we have the ``Other'' picture. Here $y_{multiclass} = index\ of(1, [y_{airplane}, y_{car}, y_{horse}])$, and $y_{airplane}$, $y_{car}$ and $y_{horse}$ are computed with a binary classifier.
 
-The problem may arize for disputed cases (e.g. $y_{horse} == 1$ and $y_{car} == 1$). We may train 3 additional One-to-One classifiers for each of those, if we get enough cases for it.
+The problem may arise for disputed cases (e.g. $y_{horse} == 1$ and $y_{car} == 1$). We may train 3 additional One-to-One classifiers for each of those, if we get enough cases for it.
 
 \subsection{Features description}
 \paragraph{HOG feature} HOG is widely use in computer vision. 
@@ -122,8 +122,8 @@ The test set contains 11'453 samples.
 
 This section describes the four different Machine Learning (ML) methods and models that used to classify the images. 
 First we detail the performance measure, then the classification methods.
-We experimented with both binary and multi-class classification.
-We chose to focus on multi-class classification, and then derive the binary predictions.
+We experimented with both binary and multiclass classification.
+We chose to focus on multiclass classification, and then derive the binary predictions.
 
 
 \subsection{Cross-Validation}
@@ -144,7 +144,7 @@ The next step is trying to find optimal values for the parameters with a grid se
 We obtain the best performance with a learning rate = 3, number of epoch = 90 and batch size = 200. 
 Figure \ref{tbl:errClassNN} shows the results. The overall BER is $\dfrac{1}{C}\sum Class BER= 12\%$ . 
 
-Lastly, we modify the NN to handle binary classification. This time it predicts if an object is in the set {Airplane, Car, Horse} or not. The BER with the same parameters as before is 11\%.
+Lastly, we modify the NN to handle binary classification. This time it predicts if an object is in the set $\{Airplane, Car, Horse\}$ or not. The BER with the same parameters as before is 11\%.
 
 \begin{table}
 	\centering
@@ -238,7 +238,7 @@ We chose optimal parameters using a manual form of coordinate descent, applying 
 
 \subsection{Ensemble Classifier}
 
-On top of the three classifiers, described above, we implemented an ensemble classifier. It uses the majority vote, with the-most-confiedent-wins fallback. We expect it to berform at least as the best of the three comprising classifiers. The training of all the models takes a long time on the available resources. Therefore, we are not able to directly measure the precision of the combined predictor, as we did for its components.
+On top of the three classifiers, described above, we implemented an ensemble classifier. It uses the majority vote, with the-most-confident-wins fallback. We expect it to perform at least as the best of the three comprising classifiers. The training of all the models takes a long time on the available resources. Therefore, we are not able to directly measure the precision of the combined predictor, as we did for its components.
 
 We estimate the expected multiclass prediction error for the classifier with the following formula:
 \[
@@ -248,14 +248,14 @@ Where $C$ iterates over all classes, and $weight_C$ is the predicted fraction of
 
 \section{Implementation Details}
 
-We implemented the multi-class SVM classifier, and an Ensemble classifier on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
+We implemented the multiclass SVM classifier, and an Ensemble classifier on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
 
 
 \section{Summary}
 
 In this report we described the methods used to build the image recognition system. 
 Neural networks, random forests and SVM are trained and tuned individually so that they offer a performance as good as possible.
-Finally we combined those three methods to predict the come up with the binary and multi-class predictions we have to submit. 
+Finally we combined those three methods to predict the come up with the binary and multiclass predictions we have to submit. 
 
 \paragraph{Improve the performance of the system}
 We can take several directions to improve the performance of the system.
