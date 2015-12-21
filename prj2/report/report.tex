@@ -96,7 +96,7 @@ The CNN feature array seems very sparse. However an investigation shown that eac
 We do not find any common structure for a horse, a car or an airplane, so it is reasonable to do binary prediction based on the multiclass prediction. Simply:
 $y_{binary} = (y_{multiclass} \neq 4)$  -- if the classifier did not recognize any of the three classes we have the ``Other'' picture. Here $y_{multiclass} = index\ of(1, [y_{airplane}, y_{car}, y_{horse}])$, and $y_{airplane}$, $y_{car}$ and $y_{horse}$ are computed with a binary classifier.
 
-The problem may arise for disputed cases (e.g. $y_{horse} == 1$ and $y_{car} == 1$). We may train 3 additional One-to-One classifiers for each of those, if we get enough cases for it.
+The problem may arise for disputed cases (e.g. $y_{horse} == 1$ and $y_{car} == 1$). We may train 3 additional One-vs-One classifiers for each of those, if we get enough cases for it.
 
 \subsection{Features description}
 \paragraph{HOG feature} HOG is widely use in computer vision. 
@@ -129,11 +129,10 @@ We chose to focus on multiclass classification, and then derive the binary predi
 \subsection{Cross-Validation}
 
 K-fold and Balanced Error Rate (BER) are used to measure the performance of the classification methods.
-K-fold returns an unbiased estimate of the error by randomly partitioning the data into K groups of the same size, training a classifier on K-1 group and testing the model on the remaining one. This process is repeated with each of the K groups being the test one. %<-- stopped here.
-The parameter K is not easy to set for this project. 
-We want a K that split the training and testing set with a good proportion, that is there is enough data in the training set to train a neural network, SVM or a random forest while at the same time having a testing set large enough to estimate the BER.
-A problem here is that for each fold we have to train the model, which is time consuming. 
-We used a K equal to 3, because for larger K we waste too much time training the model.
+K-fold returns an unbiased estimate of the error by randomly partitioning the data into K groups of the same size, training a classifier on K-1 group and testing the model on the remaining one. This process is repeated with each of the K groups being the test one.
+We want a K that split the training and testing set with a good proportion, such that there is enough data in the training set to train a neural network, SVM or a random forest while at the same time having a testing set large enough to estimate the BER.
+A problem here is that we need to train the model K times -- for each fold -- which is time consuming. 
+We used a K equal to 3 for parameter optimization to save time, and K=11 for estimation of test BER.
 
 \subsection{Convolutional Neural Network}
 The file named \emph{imageClassificationExample.m} given in the project website use a simple neural network (NN) from the \emph{DeepLearnToolbox}.
@@ -206,13 +205,13 @@ We obtain a BER of 10\%. Table \ref{tbl:errClassBal} shows the BER for each clas
 
 \subsection{SVM}
 
-We use One-vs-All scheme, because the time at our disposal is insufficient to train and tweak the One-vs-One SVM. The miss-prediction rates for each binary classifier are shown in the Table \ref{tbl:SVMerr}. We use HOG features for this method, as it is known to give good results \cite{zhang2010pedestrian}. Unlike the results of Foody\&Co. \cite{foody2004relative}, the performance of our SVM model is the worst amongst the tried approaches. Big difference between train and test errors suggests that the model overfit. No wonder, the number of features is bigger than the number of training data points. To overcome this problem we tried:
+We use One-vs-All scheme, because the time at our disposal is insufficient to train and tweak the 12 One-vs-One SVM models. The miss-prediction rates for each binary classifier are shown in the Table \ref{tbl:SVMerr}. We use HOG features for this method, as it is known to give good results \cite{zhang2010pedestrian}. Unlike the results of Foody\&Co. \cite{foody2004relative}, the performance of our SVM model perform worse than the other tried approaches. Big difference between train and test errors suggests that the model overfit. The likely cause is that the number of features is bigger than the number of training data points. To overcome this problem we tried:
 
-\paragraph{Feature-reduction} We computed the median histogram, summarizing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so we were unable to improve the performance of SVM with this reduced feature.
+\paragraph{Feature-reduction} We computed the median histogram, summarizing histograms for all the cells, therefore decreasing the number of features to just 32 numbers. Unfortunately, this transformation loses too much information, so while definitely eliminating overfitting, we were unable to improve the test performance of SVM compared to the using of the original feature
 
-\paragraph{Hard negative mining} A cheap way to expand the training set is to add the slightly-shaked negative images which cause misspredictions. This helps eliminate false positives improving the overal precision of the classifier, although it requires recalibration of the SVM parameters. Unfortunately, as you can see from the Table \ref{tbl:SVMerr}, it also did not help much.
+\paragraph{Hard negative mining} A cheap way to expand the training set is to add the slightly-shaked negative images that cause misspredictions. This helps eliminate false positives improving the overal precision of the classifier, although it requires recalibration of the SVM parameters. Unfortunately, as you can see from the Table \ref{tbl:SVMerr}, it also did not help much.
 
-We chose optimal parameters using a manual form of coordinate descent, applying cross validation to a number of candidate values. Since the computation for each point takes a long time, we could not reach the strict optimum, but judging by the shape of the curve, e.g. Figure \ref{fig:SVMKernelScaleBER}, we got close enough.
+We chose optimal parameters using a manual form of coordinate descent, applying cross validation to a number of candidate values. Since the computation for each point takes a long time, we could not reach the strict optimum, but judging by the shape of the curve, e.g. Figure \ref{fig:SVMKernelScaleBER}, we got close enough. Chosing a small subset of the training data in order to speed up the optimization does not help because the optimum depends on the training set.
 
 \begin{table}
   \centering
@@ -238,17 +237,17 @@ We chose optimal parameters using a manual form of coordinate descent, applying 
 
 \subsection{Ensemble Classifier}
 
-On top of the three classifiers, described above, we implemented an ensemble classifier. It uses the majority vote, with the-most-confident-wins fallback. We expect it to perform at least as the best of the three comprising classifiers. The training of all the models takes a long time on the available resources. Therefore, we are not able to directly measure the precision of the combined predictor, as we did for its components.
+On top of the three classifiers described above, we implemented an ensemble classifier. It uses the majority vote, with the-most-confident-wins fallback. We expect it to perform at least as the best of the three comprising classifiers. The training of all the models takes a long time on the available resources. Therefore, we are not able to directly measure the precision of the combined predictor, as we did for its components.
 
 We estimate the expected multiclass prediction error for the classifier with the following formula:
 \[
-BER_{ensemble} = \sum_C weight_C*min(BER_{SVM}^C, BER_{NN}^C, BER_{RF}^C)
+BER_{ensemble} = \frac{\sum_C min(BER_{SVM}^C, BER_{NN}^C, BER_{RF}^C)}{N_C}
 \]
 Where $C$ iterates over all classes, and $weight_C$ is the predicted fraction of images belonging to that class on the test dataset. The calculated value is $BER_{ensemble} \approx 7\%$.
 
 \section{Implementation Details}
 
-We implemented the multiclass SVM classifier, and an Ensemble classifier on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
+We implemented the multiclass SVM classifier (look at the \emph{SVMPredict.m}), and an Ensemble classifier (\emph{EnsemblePredict.m}) on top of the three trained classifiers: Neural Networks, Random Forest with CNN, and SVM with HOG feature.
 
 
 \section{Summary}

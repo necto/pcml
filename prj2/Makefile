@@ -25,8 +25,8 @@ code/last_updated: Makefile *.m
 report/report.pdf: report/report.tex report/*.tex report/*.bib report/figures/* report/figures/kernel_scale_ber.pdf
 	cd report && pdflatex report.tex && bibtex report && pdflatex report.tex && pdflatex report.tex
 
-report/figures/kernel_scale_ber.pdf: SVM2ClassPrediction.m OptimalSVMParams.m train/train.mat
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='optimize_kernel_scale';positiveClass=3;useNegs=false;printFigure=true;useSmalls=false;SVM2ClassPrediction;quit"
+#report/figures/kernel_scale_ber.pdf: SVM2ClassPrediction.m OptimalSVMParams.m train/train.mat
+#	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='optimize_kernel_scale';positiveClass=3;useNegs=false;printFigure=true;useSmalls=false;SVM2ClassPrediction;quit"
 
 small_images: $(small_images_list)
 
@@ -43,6 +43,8 @@ test/test.mat:
 train:
 	wget "http://cvlabwww.epfl.ch/~cjbecker/pcml_project2/train.tar.gz"
 	tar -xvzf train.tar.gz
+
+train/train.mat: train
 
 train/small_imgs: train
 	mkdir -p train/small_imgs
@@ -61,7 +63,7 @@ overfeat: overfeat.tgz
 	tar -xvzf overfeat.tgz
 	cd overfeat && python download_weights.py
 
-models/NeuralNetwork.mat models/RandomForest.mat: *.m
+models/NeuralNetwork.mat models/RandomForest.mat: *.m train/train.mat
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;model='trainModels';correctImbalance=false;classificationWithNNandRF;quit"
 
 models/svmC1.mat: *.m
