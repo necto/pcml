@@ -1,15 +1,66 @@
-clearvars;
-close all;
+if (exist('reportMode', 'var') == 0)
+    clearvars;
+    close all;
+    % Possible values: 
+    % measure_BER             : use CV to measure the SVM performance
+    % produce_model           : use the full training set to train and
+    %                           save an SVM model
+    % optimize_bias           : search for an optimal bias parameter
+    %                           (manual)
+    % optimize_box_constraint : search for an optimal box constraint
+    %                          (manual)
+    % optimize_kernel_scale   : search for an optimal kernel scale (manual)
+    %                           also if printFigure is true, saves the
+    %                           figure useful for the report.
+    task = 'measure_BER';
+    
+    % The class we are working with.
+    % 1 - Aeroplane; 2 - Car; 3 - Horse
+    positiveClass = 1;
+    
+    % Use the hard-negative mined additional training set
+    useNegs = false;
+    
+    % Print the generated figure for the report. 
+    printFigure = true;
+    
+    % Use a small features instead. For performance only.
+    useSmalls = false;
+    
+    % The Cross Validation number of folds.
+    K = 3;
+else
+    % Some default values for the report mode.
+    if (exist('positiveClass', 'var') == 0)
+        positiveClass = 1;
+    end
+    if (exist('useNegs', 'var') == 0)
+        useNegs = true;
+    end
+    if (exist('printFigure', 'var') == 0)
+        printFigure = true;
+    end
+    if (exist('useSmalls', 'var') == 0)
+        useSmalls = false;
+    end
+    if (exist('K', 'var') == 0)
+        K = 3;
+    end
+    
+    % You have to specify the 'task' explicitly. Look at the section above
+    % for the possible values.
+end;
+
+
 % Load features and labels of training data
-%load train/small.mat;
-%train = small;
-load train/train.mat;
+if (useSmalls)
+    load train/small.mat;
+    train = small;
+else
+    load train/train.mat;
+end
 
-
-positiveClass = 3;
-useNegs = false;
-printFigure = true;
-
+% Load the hard-negative additional training data.
 negs = [];
 negLabels = [];
 if (useNegs)
@@ -29,15 +80,27 @@ if (useNegs)
     [negs, ~, ~] = zscore(negs);
 end
 
+% Get the optimal SVM parameters.
 [optimalKernelScale, optimalBoxConstraint, optimalBias] = ...
     OptimalSVMParams(positiveClass, useNegs);
 
+% Decipher what we are going to do this time.
+measure_BER = strcmp(task, 'measure_BER');
+produce_model = strcmp(task, 'produce_model');
+optimize_bias = strcmp(task, 'optimize_bias');
+optimize_box_constraint = strcmp(task, 'optimize_box_constraint');
+optimize_kernel_scale = strcmp(task, 'optimize_kernel_scale');
+
+if (~(measure_BER || produce_model || optimize_bias || ...
+      optimize_box_constraint || optimize_kernel_scale))
+  fprintf('%s is not a valid task\n', task);
+end
+
 
 %% Prepare the data
-% split randomly into train/test, use K-fold
+% Split randomly into train/test, use K-fold
 fprintf('Splitting into train/test..\n');
-K = 2;
-N = size(train.y, 1)/5;
+N = size(train.y, 1);
 idx = randperm(N);
 Nk = floor(N/K);
 idxCV = zeros(K, Nk);
@@ -49,9 +112,8 @@ end;
 [train.X_hog, mu, sigma] = zscore(train.X_hog);
 
 %% HOG SVM prediction
-produce_model = false;
-if (produce_model)
-    fprintf('producing model for class %d\n', positiveClass);
+if (measure_BER)
+    fprintf('Measuring performance for class %d\n', positiveClass);
     tic
     TeBERSub = zeros(K, 1);
     TrBERSub = zeros(K, 1);
@@ -75,21 +137,26 @@ if (produce_model)
     stdTe = std(TeBERSub);
     stdTr = std(TrBERSub);
     toc
-    
+    fprintf('Test BER: %d (std %d), Train BER: %d (std %d)\n', ...
+            berTe, stdTe, berTr, stdTr);
+end
+
+%% Produce and save the model
+if (produce_model)
+    fprintf('Producing model for class %d\n', positiveClass);
     train_labels = (train.y == positiveClass)*2 - 1;
     fprintf('Creating a model on the full train dataset\n');
     SVMModel = fitcsvm([train.X_hog; negs], [train_labels; negLabels], ...
                        'KernelFunction', 'rbf', 'KernelScale', ks, ...
                        'BoxConstraint', bc, 'Cost', [0 1; bias 0] );
+    fprintf('Saving the model\n');
     modelFileName = sprintf('models/svmC%d.mat', positiveClass);
     save(modelFileName, 'SVMModel');
-    fprintf('test BER: %d (std %d), train BER: %d (std %d)', ...
-            berTe, stdTe, berTr, stdTr);
 end
 
-optimizing_biases = false;
-if(optimizing_biases)
-    fprintf('optimizing bias\n');
+%% Optimize the bias parameter
+if(optimize_bias)
+    fprintf('Optimizing bias\n');
     rng(1) % platform dependent!!
     biases = logspace(1, 1.5, 6);
     bers = zeros(length(biases), 1);
@@ -119,9 +186,9 @@ if(optimizing_biases)
     semilogx(biases,berTr);
 end
 
-optimize_box_constraint = false;
+%% Optimize the Box Constraint of SVM
 if (optimize_box_constraint)
-    fprintf('optimizeing box constraint\n');
+    fprintf('Optimizing box constraint\n');
     rng(1) % platform dependent!!
     box_constraints = logspace(-0.5, 1, 20);
     bers = zeros(length(box_constraints), 1);
@@ -151,9 +218,9 @@ if (optimize_box_constraint)
     semilogx(box_constraints,berTr);
 end
 
-optimize_kernel_scale = true;
+%% Optimize the kernel scale
 if (optimize_kernel_scale)
-    fprintf('optimizing kernel scale\n');
+    fprintf('Optimizing kernel scale\n');
     rng(1) % platform dependent!!
     kernel_scales = logspace(1, 3, 40);
     for ksi = 1:length(kernel_scales)

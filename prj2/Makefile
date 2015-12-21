@@ -19,6 +19,7 @@ pred_binary.mat pred_multiclass.mat: models/svmC1.mat models/svmC2.mat models/sv
 code/last_updated: Makefile *.m
 	cp Makefile code/
 	cp *.m code/
+	mkdir -p code/models
 	touch code/last_updated
 
 report/report.pdf: report/report.tex report/*.tex report/*.bib report/figures/*
@@ -56,3 +57,12 @@ overfeat: overfeat.tgz
 
 models/NeuralNetwork.mat models/RandomForest.mat: *.m
 	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;model='trainModels';correctImbalance=false;classificationWithNNandRF;quit"
+
+models/svmC1.mat: *.m
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=1;useNegs=false;useSmalls=false;SVM2ClassPrediction;quit"
+
+models/svmC2.mat: *.m
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=2;useNegs=false;useSmalls=false;SVM2ClassPrediction;quit"
+
+models/svmC3.mat: *.m
+	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=3;useNegs=false;useSmalls=false;SVM2ClassPrediction;quit"
