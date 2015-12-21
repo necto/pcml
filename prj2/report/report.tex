@@ -149,7 +149,7 @@ Lastly, we modify the NN to handle binary classification. This time it predicts 
 \begin{table}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|}
-		\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & BER \\ 
+		\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & Class BER \\ 
 		\hline Airplane	  & 323 & 285 & 11 & 3 & 24 & 12 ($\pm$ 1)\% \\ 
 		\hline Car			& 383 & 7 & 352 & 0 & 24 &  8 ($\pm$ 2)\% \\ 
 		\hline Horse      & 513 & 4 & 2 & 450 & 57 &  14 ($\pm$ 2)\% \\ 
@@ -167,18 +167,19 @@ As a consequence, we chose to experiment with them to try to outperform our firs
 Random forests choose randomly a subset of input variables to build many trees and reduce the variance of the output by taking the average of many outputs.
 
 Here we use the Matlab function named \emph{TreeBagger}. We set the number of trees to 300, this value was determined with grid search.
-We obtain a BER of 13\% with 3-fold cross validation. Table \ref{tbl:errClassNotBal} shows the predictions error for each class. Take the first line as example. The true class is Airplane and there is $N_c$ sample in it. The following columns shows what the random forest predicted.
-Here we notice that the majority of error is because the method put an image in the categorie Other when it is actually another one.
+We obtain a BER of 13\% with 3-fold cross validation. Table \ref{tbl:errClassNotBal} shows the predictions error for each class. Take the first line as example. The true class is Airplane and there is $N_c$ sample in it. The following columns show what the random forest predicted.
+Here we notice that most of the samples that are misclassified are put in the categorie "Other" when they actually belong to another one.
 This is maybe because of the class imbalance during the training of the model. Indeed we mention earlier that there are 6000 images: 964 airplanes, 1162 cars, 1492 horses and 2382 other objects.
 
-The next step is to train the model with the same proportion of images in each class, by randomly deleting sample in the classes with more data. Ideally, we would prefer adding images in the class with less samples, so we don't reduce our training set but increase it.
-So we end up with a training set containing 964 images for each class. 
+The next step is to create the decision trees with a balanced training set. Ideally we want to add images in the classes with less samples so we increase the size of the training set.
+Here adding hundreds of new images would definitely violate the 20MB size constraints, so instead we reduced the size of the training set by randomly deleting sample in the classes with more data. 
+We end up with a training set containing 964 images for each class, so a total of 3856 images. 
 We obtain a BER of 10\%. Table \ref{tbl:errClassBal} shows the BER for each class.
 
 \begin{table}[!htb]
 	\centering
 		\begin{tabular}{|c|c|c|c|c|c|c|}
-			\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & BER \\ 
+			\hline Class & $N_{c}$ & Airplane & Car & Horse & Other & Class BER \\ 
 			\hline Airplane    & 322 & 259 & 16 & 1 & 46 & 20 ($\pm$ 1)\% \\ 
 			\hline Car 			 & 382 & 1 & 356 & 2 & 23 & 6 ($\pm$ 1)\% \\ 
 			\hline Horse       & 489 & 0 & 1 & 393 & 95 & 19 ($\pm$ 1)\% \\ 
@@ -192,7 +193,7 @@ We obtain a BER of 10\%. Table \ref{tbl:errClassBal} shows the BER for each clas
 \begin{table}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|}
-		\hline Class 		 & $N_{c}$ & Airplane & Car & Horse & Other & BER \\ 
+		\hline Class 		 & $N_{c}$ & Airplane & Car & Horse & Other & Class BER \\ 
 		\hline Airplane 	& 328 & 303 & 8 & 0 & 17 & 8 ($\pm$ 1)\% \\ 
 		\hline Car 			  & 329 & 6 & 312 & 3 & 8 & 4 ($\pm$ 1)\% \\ 
 		\hline Horse		& 324 & 2 & 0 & 299 & 23 & 8 ($\pm$ 1)\% \\ 
@@ -232,7 +233,7 @@ We chose optimal parameters using a manual form of coordinate descent, applying 
 \begin{figure}[!t]
   \centering
   \includegraphics[width=0.9\textwidth]{figures/kernel_scale_ber.pdf}
-  \caption{Dependency of train ant test BER of the Scale of the SVM kernel.}
+  \caption{Dependency of train and test BER on the Scale of the SVM kernel.}
   \label{fig:SVMKernelScaleBER}
 \end{figure}
 
@@ -255,7 +256,7 @@ We implemented the multiclass SVM classifier, and an Ensemble classifier on top 
 
 In this report we described the methods used to build the image recognition system. 
 Neural networks, random forests and SVM are trained and tuned individually so that they offer a performance as good as possible.
-Finally we combined those three methods to predict the come up with the binary and multiclass predictions we have to submit. 
+Finally we combine those three methods to come up with the binary and multiclass predictions we have to submit. 
 
 \paragraph{Improve the performance of the system}
 We can take several directions to improve the performance of the system.

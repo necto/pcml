@@ -13,7 +13,7 @@ istanbul.zip: report/report.pdf pred_binary.mat pred_multiclass.mat code/last_up
 	zip -r -j istanbul.zip submission
 	rm -r submission
 
-pred_binary.mat pred_multiclass.mat: models/svmC1.mat models/svmC2.mat models/svmC3.mat models/NeuralNetwork.mat models/RandomForest.mat train/negs3.mat train/negs2.mat train/negs1.mat train/train.mat test/test.mat
+pred_binary.mat pred_multiclass.mat: models/svmC1.mat models/svmC2.mat models/svmC3.mat models/NeuralNetwork.mat models/RandomForest.mat  train/train.mat test/test.mat
 	matlab -nodesktop -nosplash -nodisplay -r 'predict;quit'
 
 code/last_updated: Makefile *.m
@@ -25,16 +25,16 @@ code/last_updated: Makefile *.m
 report/report.pdf: report/report.tex report/*.tex report/*.bib report/figures/* report/figures/kernel_scale_ber.pdf
 	cd report && pdflatex report.tex && bibtex report && pdflatex report.tex && pdflatex report.tex
 
-report/figures/kernel_scale_ber.pdf: SVM2ClassPrediction.m OptimalSVMParams.m train/train.mat
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='optimize_kernel_scale';positiveClass=3;useNegs=false;printFigure=true;useSmalls=false;SVM2ClassPrediction;quit"
+#report/figures/kernel_scale_ber.pdf: SVM2ClassPrediction.m OptimalSVMParams.m train/train.mat
+#	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='optimize_kernel_scale';positiveClass=3;useNegs=false;printFigure=true;useSmalls=false;SVM2ClassPrediction;quit"
 
 small_images: $(small_images_list)
 
-train/negs3.mat train/negs2.mat train/negs1.mat: train models/svmC1.mat models/svmC2.mat models/svmC3.mat
-	matlab -nodesktop -nosplash -nodisplay -r 'hardNegativeMining;quit;'
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=1;useNegs=true;useSmalls=false;SVM2ClassPrediction;quit"
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=2;useNegs=true;useSmalls=false;SVM2ClassPrediction;quit"
-	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=3;useNegs=true;useSmalls=false;SVM2ClassPrediction;quit"
+#train/negs3.mat train/negs2.mat train/negs1.mat: train models/svmC1.mat models/svmC2.mat models/svmC3.mat
+#	matlab -nodesktop -nosplash -nodisplay -r 'hardNegativeMining;quit;'
+#	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=1;useNegs=true;useSmalls=false;SVM2ClassPrediction;quit"
+#	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=2;useNegs=true;useSmalls=false;SVM2ClassPrediction;quit"
+#	matlab -nodesktop -nosplash -nodisplay -r "reportMode=true;task='produce_model';positiveClass=3;useNegs=true;useSmalls=false;SVM2ClassPrediction;quit"
 
 test/test.mat:
 	mkdir -p test
