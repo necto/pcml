@@ -13,6 +13,9 @@ istanbul.zip: report/report.pdf pred_binary.mat pred_multiclass.mat code/last_up
 	zip -r -j istanbul.zip submission
 	rm -r submission
 
+pred_binary.mat pred_multiclass.mat: models/svmC1.mat models/cvmC2.mat models/svmC3.mat models/NeuralNetwork.mat models/RandomForest.mat
+	matlab -nodesktop -nosplash -nodisplay -r 'predict;quit'
+
 code/last_updated: Makefile *.m
 	cp Makefile code/
 	cp *.m code/
