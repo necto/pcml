@@ -19,7 +19,7 @@ code/last_updated: Makefile *.m
 	touch code/last_updated
 
 report/report.pdf: report/report.tex report/*.tex report/*.bib report/figures/*
-	cd report && pdflatex report.tex && pdflatex report.tex
+	cd report && pdflatex report.tex && bibtex report && pdflatex report.tex && pdflatex report.tex
 
 small_images: $(small_images_list)
 
